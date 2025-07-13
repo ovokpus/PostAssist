@@ -178,13 +178,76 @@ def run_linkedin_post_generation(
     # Create initial state
     initial_state = enter_linkedin_meta_state(request_message, task_id)
     
-    # Run the complete workflow
+    # Run the complete workflow using streaming
     try:
         result = compiled_linkedin_graph.invoke(
             initial_state,
             {"recursion_limit": 50}
         )
         return result
+    except Exception as e:
+        return {
+            "error": str(e),
+            "task_id": task_id,
+            "status": "failed"
+        }
+
+
+def stream_linkedin_post_generation(
+    paper_title: str,
+    additional_context: str = None,
+    target_audience: str = "professional",
+    include_technical_details: bool = True,
+    max_hashtags: int = 10,
+    tone: str = "professional",
+    task_id: str = None,
+    status_callback=None
+):
+    """
+    Stream the LinkedIn post generation process with real-time updates.
+    
+    Args:
+        paper_title: Title of the ML paper
+        additional_context: Additional context or focus areas
+        target_audience: Target audience for the post
+        include_technical_details: Whether to include technical details
+        max_hashtags: Maximum number of hashtags
+        tone: Tone of the post
+        task_id: Optional task ID for tracking
+        status_callback: Async function to call with status updates
+        
+    Yields:
+        Real-time streaming updates from the agent workflow
+    """
+    # Create the request message
+    request_message = create_linkedin_post_request(
+        paper_title=paper_title,
+        additional_context=additional_context,
+        target_audience=target_audience,
+        include_technical_details=include_technical_details,
+        max_hashtags=max_hashtags,
+        tone=tone
+    )
+    
+    # Create initial state
+    initial_state = enter_linkedin_meta_state(request_message, task_id)
+    
+    # Stream the complete workflow
+    try:
+        for step in compiled_linkedin_graph.stream(
+            initial_state,
+            {"recursion_limit": 50}
+        ):
+            if "__end__" not in step:
+                # Call status callback if provided
+                if status_callback:
+                    import asyncio
+                    asyncio.create_task(status_callback(step, task_id))
+                yield step
+                
+        # Return final result
+        return {"status": "completed", "task_id": task_id}
+        
     except Exception as e:
         return {
             "error": str(e),

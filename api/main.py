@@ -312,7 +312,7 @@ async def health_check():
 
 
 async def run_post_generation_task(task_id: str, request: PostGenerationRequest):
-    """Background task to generate LinkedIn post."""
+    """Background task to generate LinkedIn post using streaming approach."""
     try:
         await update_task_status(task_id, TaskStatus.IN_PROGRESS, 0.1, "starting")
         
@@ -324,33 +324,164 @@ async def run_post_generation_task(task_id: str, request: PostGenerationRequest)
         await update_agent_status(task_id, "StyleChecker", AgentStatus.IDLE, "Ready for style review")
         
         # Import here to avoid circular imports
-        from api.agents.meta_supervisor import run_linkedin_post_generation
+        from api.agents.meta_supervisor import stream_linkedin_post_generation
         
         await update_task_status(task_id, TaskStatus.IN_PROGRESS, 0.2, "researching_paper")
         await update_team_focus(task_id, "Content team", "Starting research on ML paper", "research")
         await update_agent_status(task_id, "PaperResearcher", AgentStatus.WORKING, "Searching for paper information", 0.1)
         
-        # Run the LinkedIn post generation
-        result = run_linkedin_post_generation(
+        # Stream the LinkedIn post generation with real-time updates
+        final_result = None
+        all_messages = []
+        current_progress = 0.2
+        
+        # Create status callback for real-time updates
+        async def process_stream_step(step, task_id):
+            nonlocal current_progress, all_messages
+            
+            print(f"🔄 Processing stream step: {step}")  # Debug logging
+            
+            # Extract step information
+            for node_name, node_result in step.items():
+                if "messages" in node_result:
+                    all_messages.extend(node_result["messages"])
+                    
+                print(f"📍 Node: {node_name}, Result: {node_result}")  # Debug logging
+                    
+                # Update agent status based on current node with granular updates
+                if node_name == "meta_supervisor":
+                    next_action = node_result.get("next", "")
+                    if next_action == "Content team":
+                        await update_task_status(task_id, TaskStatus.IN_PROGRESS, 0.3, "content_creation")
+                        await update_team_focus(task_id, "Content team", "Meta-supervisor directing to content creation", "content_creation")
+                        # Start content team workflow
+                        await update_agent_status(task_id, "PaperResearcher", AgentStatus.WORKING, "Preparing to research ML paper", 0.2)
+                        current_progress = 0.3
+                    elif next_action == "Verification team":
+                        await update_task_status(task_id, TaskStatus.IN_PROGRESS, 0.7, "verification")
+                        await update_team_focus(task_id, "Verification team", "Meta-supervisor directing to verification", "verification")
+                        await update_agent_status(task_id, "TechVerifier", AgentStatus.WORKING, "Starting technical accuracy check", 0.7)
+                        current_progress = 0.7
+                    elif next_action == "FINISH":
+                        current_progress = 1.0
+                        await update_task_status(task_id, TaskStatus.IN_PROGRESS, 1.0, "finalizing")
+                        
+                elif node_name == "Content team":
+                    # Analyze the specific message to understand what happened
+                    messages = node_result.get("messages", [])
+                    if messages:
+                        latest_message = messages[-1]
+                        agent_name = getattr(latest_message, 'name', '')
+                        content = getattr(latest_message, 'content', '')
+                        
+                        print(f"🎯 Content team agent: {agent_name}, content preview: {content[:100]}...")
+                        
+                        if agent_name == "PaperResearcher":
+                            await update_agent_status(task_id, "PaperResearcher", AgentStatus.WORKING, "Researching paper methodology and results", 0.5)
+                            await update_agent_status(task_id, "LinkedInCreator", AgentStatus.IDLE, "Waiting for research completion")
+                        elif agent_name == "LinkedInCreator":
+                            await update_agent_status(task_id, "PaperResearcher", AgentStatus.COMPLETED, "Paper research completed", 1.0)
+                            await update_agent_status(task_id, "LinkedInCreator", AgentStatus.WORKING, "Creating engaging LinkedIn post", 0.8)
+                        
+                    # Content team workflow in progress or completed
+                    await update_task_status(task_id, TaskStatus.IN_PROGRESS, 0.6, "content_complete")
+                    await complete_team(task_id, "Content team", "Research and content creation completed")
+                    await update_agent_status(task_id, "LinkedInCreator", AgentStatus.COMPLETED, "LinkedIn post created successfully", 1.0)
+                    current_progress = 0.6
+                    
+                elif node_name == "Verification team":
+                    # Analyze verification team messages
+                    messages = node_result.get("messages", [])
+                    if messages:
+                        latest_message = messages[-1]
+                        agent_name = getattr(latest_message, 'name', '')
+                        content = getattr(latest_message, 'content', '')
+                        
+                        print(f"🛡️ Verification team agent: {agent_name}, content preview: {content[:100]}...")
+                        
+                        if agent_name == "TechVerifier":
+                            await update_agent_status(task_id, "TechVerifier", AgentStatus.WORKING, "Verifying technical claims and accuracy", 0.8)
+                            await update_agent_status(task_id, "StyleChecker", AgentStatus.IDLE, "Waiting for technical verification")
+                        elif agent_name == "StyleChecker":
+                            await update_agent_status(task_id, "TechVerifier", AgentStatus.COMPLETED, "Technical verification passed", 1.0)
+                            await update_agent_status(task_id, "StyleChecker", AgentStatus.WORKING, "Checking LinkedIn style compliance", 0.9)
+                    
+                    # Verification team completed
+                    await update_task_status(task_id, TaskStatus.IN_PROGRESS, 0.9, "verification_complete")
+                    await complete_team(task_id, "Verification team", "Technical and style verification completed")
+                    await update_agent_status(task_id, "StyleChecker", AgentStatus.COMPLETED, "Style verification passed", 1.0)
+                    current_progress = 0.9
+                    
+                # Additional granular agent updates for specific nodes
+                elif node_name in ["PaperResearcher", "LinkedInCreator", "TechVerifier", "StyleChecker"]:
+                    messages = node_result.get("messages", [])
+                    if messages:
+                        latest_message = messages[-1]
+                        content = getattr(latest_message, 'content', '')
+                        
+                        # Real-time agent-specific updates
+                        if node_name == "PaperResearcher":
+                            if "research" in content.lower() or "paper" in content.lower():
+                                await update_agent_status(task_id, "PaperResearcher", AgentStatus.WORKING, "Analyzing paper methodology and key findings", 0.4)
+                            else:
+                                await update_agent_status(task_id, "PaperResearcher", AgentStatus.WORKING, "Extracting research insights", 0.5)
+                                
+                        elif node_name == "LinkedInCreator":
+                            if "post" in content.lower() or "linkedin" in content.lower():
+                                await update_agent_status(task_id, "LinkedInCreator", AgentStatus.WORKING, "Crafting engaging LinkedIn content", 0.7)
+                            else:
+                                await update_agent_status(task_id, "LinkedInCreator", AgentStatus.WORKING, "Formatting post with hashtags", 0.8)
+                                
+                        elif node_name == "TechVerifier":
+                            await update_agent_status(task_id, "TechVerifier", AgentStatus.WORKING, "Cross-checking technical accuracy", 0.8)
+                            
+                        elif node_name == "StyleChecker":
+                            await update_agent_status(task_id, "StyleChecker", AgentStatus.WORKING, "Optimizing for LinkedIn best practices", 0.9)
+        
+        # Run streaming generation
+        for step in stream_linkedin_post_generation(
             paper_title=request.paper_title,
             additional_context=request.additional_context,
             target_audience=request.target_audience,
             include_technical_details=request.include_technical_details,
             max_hashtags=request.max_hashtags,
             tone=request.tone,
-            task_id=task_id
-        )
+            task_id=task_id,
+            status_callback=process_stream_step
+        ):
+            await process_stream_step(step, task_id)
+            final_result = step
         
-        if "error" in result:
+        # Process final results
+        result = {"messages": all_messages}
+        
+        if final_result and "error" in final_result:
             await update_task_status(
                 task_id, TaskStatus.FAILED, 1.0, "failed", 
-                error=result["error"]
+                error=final_result["error"]
             )
         else:
-            # Extract the final post from the result
+            # Extract the actual LinkedIn post from the content creation phase
             final_post_content = ""
+            
+            # Look for the LinkedIn post created by LinkedInCreator
             if "messages" in result and result["messages"]:
-                final_post_content = result["messages"][-1].content
+                for message in result["messages"]:
+                    # Look for content that looks like a LinkedIn post (contains hashtags, engagement elements)
+                    content = message.content
+                    if ("#" in content and len(content) > 100 and 
+                        ("LinkedIn" in content or "🚀" in content or "💡" in content or 
+                         "What do you think" in content or "Share your thoughts" in content)):
+                        final_post_content = content
+                        break
+                
+                # Fallback: if no LinkedIn-style post found, use the longest message
+                if not final_post_content:
+                    final_post_content = max(
+                        (msg.content for msg in result["messages"]), 
+                        key=len, 
+                        default=""
+                    )
             
             # Create LinkedIn post object
             linkedin_post = LinkedInPost(

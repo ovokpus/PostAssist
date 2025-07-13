@@ -45,6 +45,9 @@ export default function HomePage() {
   const [teams, setTeams] = useState<TeamProgress[]>([]);
   const [currentTeam, setCurrentTeam] = useState<string>('');
   const [phase, setPhase] = useState<string>('');
+  
+  // Flag to prevent duplicate toast notifications
+  const [completionToastShown, setCompletionToastShown] = useState(false);
 
   const targetAudienceOptions = [
     { value: 'academic', label: 'Academic Researchers' },
@@ -86,6 +89,7 @@ export default function HomePage() {
     setIsGenerating(true);
     setGeneratedPost(null);
     setProgress(0);
+    setCompletionToastShown(false); // Reset toast flag for new generation
     
     try {
       const response = await generatePost({
@@ -101,27 +105,37 @@ export default function HomePage() {
       await pollTaskStatus(
         response.task_id,
         (statusResponse: PostStatusResponse) => {
-          setProgress(statusResponse.status.progress);
+          setProgress(statusResponse.progress);
           
           // Update enhanced status tracking
-          if (statusResponse.status.teams) {
-            setTeams(statusResponse.status.teams);
+          if (statusResponse.teams) {
+            setTeams(statusResponse.teams);
           }
-          if (statusResponse.status.current_team) {
-            setCurrentTeam(statusResponse.status.current_team);
+          if (statusResponse.current_team) {
+            setCurrentTeam(statusResponse.current_team);
           }
-          if (statusResponse.status.phase) {
-            setPhase(statusResponse.status.phase);
+          if (statusResponse.phase) {
+            setPhase(statusResponse.phase);
           }
-          if (statusResponse.status.detailed_status) {
-            setDetailedStatus(statusResponse.status.detailed_status);
+          if (statusResponse.detailed_status) {
+            setDetailedStatus(statusResponse.detailed_status);
           }
           
-          if (statusResponse.status.status === 'completed' && statusResponse.result) {
-            setGeneratedPost(statusResponse.result);
-            toast.success('Post generated successfully!');
-          } else if (statusResponse.status.status === 'failed') {
-            toast.error(statusResponse.status.error_message || 'Generation failed');
+          // Only show completion toast once
+          if (!completionToastShown) {
+            if (statusResponse.status === 'completed' && statusResponse.result) {
+              setGeneratedPost(statusResponse.result);
+              toast.success('Post generated successfully!');
+              setCompletionToastShown(true);
+            } else if (statusResponse.status === 'failed') {
+              toast.error(statusResponse.error_message || 'Generation failed');
+              setCompletionToastShown(true);
+            }
+          } else {
+            // Still update the post result even if toast was already shown
+            if (statusResponse.status === 'completed' && statusResponse.result) {
+              setGeneratedPost(statusResponse.result);
+            }
           }
         }
       );
@@ -249,11 +263,11 @@ export default function HomePage() {
                   currentTeam={currentTeam}
                   phase={phase}
                   detailedStatus={detailedStatus}
-                  overallProgress={progress / 100}
+                  overallProgress={progress}
                 />
               )}
 
-              {generatedPost && (
+              {generatedPost &&
                 <div className="space-y-4">
                   <div className="p-4 bg-muted/50 rounded-lg">
                     <pre className="whitespace-pre-wrap text-sm text-foreground font-medium">
@@ -261,26 +275,31 @@ export default function HomePage() {
                     </pre>
                   </div>
                   
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <Target className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm font-medium">Hashtags:</span>
+                  {generatedPost.hashtags.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <Target className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm font-medium">Hashtags:</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {generatedPost.hashtags.map((hashtag, index) => (
+                          <span key={index} className="px-2 py-1 bg-primary/10 text-primary rounded text-sm">
+                            {hashtag}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      {generatedPost.hashtags.map((hashtag, index) => (
-                        <span key={index} className="px-2 py-1 bg-primary/10 text-primary rounded text-sm">
-                          {hashtag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
+                  )}
 
                   <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <span>Words: {generatedPost.word_count}</span>
                     <span>Characters: {generatedPost.character_count}</span>
-                    <span>Est. Reach: {generatedPost.estimated_reach.toLocaleString()}</span>
+                    {generatedPost.engagement_score && (
+                      <span>Engagement Score: {Math.round(generatedPost.engagement_score * 100)}%</span>
+                    )}
                   </div>
                 </div>
-              )}
+              }
 
               {!isGenerating && !generatedPost && (
                                  <div className="text-center py-8">

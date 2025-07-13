@@ -29,10 +29,9 @@ export interface BatchPostRequest {
 export interface LinkedInPost {
   content: string;
   hashtags: string[];
-  engagement_hooks: string[];
-  call_to_action: string;
+  engagement_score?: number;
+  word_count: number;
   character_count: number;
-  estimated_reach: number;
 }
 
 export interface VerificationReport {
@@ -94,9 +93,18 @@ export interface PostGenerationResponse {
 
 export interface PostStatusResponse {
   task_id: string;
-  status: TaskStatus;
+  status: 'pending' | 'in_progress' | 'completed' | 'failed';
+  progress: number;
+  current_step?: string;
+  teams: TeamProgress[];
+  current_team?: string;
+  phase?: string;
+  detailed_status?: string;
   result?: LinkedInPost;
-  error?: string;
+  verification?: VerificationReport;
+  error_message?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface PostVerificationResponse {

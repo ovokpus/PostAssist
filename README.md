@@ -198,6 +198,37 @@ python scripts/utils.py health
 python scripts/utils.py checklist
 ```
 
+## 🧪 Test Examples
+
+Here are 5 short ML papers from arXiv perfect for testing PostAssist:
+
+### 1. **Scaling Synthetic Data Creation with 1,000,000,000 Personas**
+- **arXiv ID**: `2406.20094`
+- **Topic**: LLM-based synthetic data generation
+- **Why test-worthy**: Hot topic, practical applications, easy to understand
+
+### 2. **On Large Language Models in National Security Applications** 
+- **arXiv ID**: `2407.03453`
+- **Topic**: LLMs in security contexts
+- **Why test-worthy**: 20 pages, policy implications, broad audience appeal
+
+### 3. **MLD-EA: Check and Complete Narrative Coherence by Introducing Emotions and Actions**
+- **arXiv ID**: `2412.02897`
+- **Topic**: Narrative understanding with LLMs
+- **Why test-worthy**: Recent (Dec 2024), emotion + AI angle, story generation
+
+### 4. **Apple Vision Pro: Comments in Healthcare**
+- **arXiv ID**: `2401.08685`
+- **Topic**: AR/VR in medical applications
+- **Why test-worthy**: Short, practical applications, trending technology
+
+### 5. **Why is it so hard to find a job now? Enter Ghost Jobs**
+- **arXiv ID**: `2410.21771`
+- **Topic**: LLM-BERT analysis of employment market
+- **Why test-worthy**: Relatable topic, economic impact, uses ML techniques
+
+💡 **Pro tip**: Try different target audiences (Academic vs Professional vs General) and tones (Professional vs Conversational vs Technical) to see how PostAssist adapts the content!
+
 ## 🔧 Configuration
 
 ### Required Environment Variables
