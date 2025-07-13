@@ -80,7 +80,9 @@ async def store_task(task_id: str, task_data: Dict[str, Any]):
     client = await get_redis_client()
     if client:
         try:
-            await client.setex(f"task:{task_id}", 3600, str(task_data))  # 1 hour TTL
+            # Use proper JSON serialization instead of str()
+            serialized_data = json.dumps(task_data, default=datetime_json_encoder)
+            await client.setex(f"task:{task_id}", 7200, serialized_data)  # 2 hour TTL
         except Exception:
             task_storage[task_id] = task_data
     else:
@@ -94,7 +96,8 @@ async def get_task(task_id: str) -> Optional[Dict[str, Any]]:
         try:
             data = await client.get(f"task:{task_id}")
             if data:
-                return eval(data.decode())  # Note: In production, use proper serialization
+                # Use proper JSON deserialization instead of eval()
+                return json.loads(data.decode())
         except Exception:
             pass
     
