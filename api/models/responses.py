@@ -13,6 +13,101 @@ class TaskStatus(str, Enum):
     CANCELLED = "cancelled"
 
 
+class AgentStatus(str, Enum):
+    """Enumeration for individual agent status values."""
+    IDLE = "idle"
+    WORKING = "working"
+    COMPLETED = "completed"
+    ERROR = "error"
+
+
+class AgentFeedback(BaseModel):
+    """Model for individual agent feedback."""
+    
+    agent_name: str = Field(
+        description="Name of the agent",
+        examples=["PaperResearcher", "LinkedInCreator", "TechVerifier", "StyleChecker"]
+    )
+    
+    status: AgentStatus = Field(
+        description="Current status of the agent"
+    )
+    
+    current_activity: Optional[str] = Field(
+        default=None,
+        description="What the agent is currently doing",
+        examples=["Searching for paper information", "Creating engaging content", "Verifying technical claims"]
+    )
+    
+    progress: float = Field(
+        description="Agent's progress (0.0 to 1.0)",
+        ge=0.0,
+        le=1.0,
+        default=0.0
+    )
+    
+    findings: Optional[str] = Field(
+        default=None,
+        description="Key findings or outputs from the agent"
+    )
+    
+    last_update: datetime = Field(
+        default_factory=datetime.utcnow,
+        description="When this agent was last updated"
+    )
+    
+    error_message: Optional[str] = Field(
+        default=None,
+        description="Error message if agent failed"
+    )
+
+
+class TeamProgress(BaseModel):
+    """Model for team-level progress tracking."""
+    
+    team_name: str = Field(
+        description="Name of the team",
+        examples=["Content team", "Verification team"]
+    )
+    
+    status: TaskStatus = Field(
+        description="Overall team status"
+    )
+    
+    progress: float = Field(
+        description="Team's overall progress (0.0 to 1.0)",
+        ge=0.0,
+        le=1.0,
+        default=0.0
+    )
+    
+    current_focus: Optional[str] = Field(
+        default=None,
+        description="What the team is currently focused on",
+        examples=["Researching ML paper methodology", "Verifying technical accuracy"]
+    )
+    
+    agents: List[AgentFeedback] = Field(
+        default=[],
+        description="Individual agent feedback within the team"
+    )
+    
+    team_findings: Optional[str] = Field(
+        default=None,
+        description="Key outputs or findings from the team"
+    )
+    
+    started_at: Optional[datetime] = Field(
+        default=None,
+        description="When the team started working"
+    )
+    
+    completed_at: Optional[datetime] = Field(
+        default=None,
+        description="When the team completed their work"
+    )
+
+
 class PostGenerationResponse(BaseModel):
     """Response model for post generation requests."""
     
@@ -120,6 +215,30 @@ class PostStatusResponse(BaseModel):
         default=None,
         description="Current processing step",
         examples=["researching_paper", "creating_post", "verifying_content"]
+    )
+    
+    # New detailed agent feedback
+    teams: List[TeamProgress] = Field(
+        default=[],
+        description="Detailed progress from each agent team"
+    )
+    
+    current_team: Optional[str] = Field(
+        default=None,
+        description="Which team is currently active",
+        examples=["Content team", "Verification team"]
+    )
+    
+    phase: Optional[str] = Field(
+        default=None,
+        description="Current phase of the workflow",
+        examples=["research", "content_creation", "verification", "completion"]
+    )
+    
+    detailed_status: Optional[str] = Field(
+        default=None,
+        description="Detailed status message from the active agent",
+        examples=["PaperResearcher is analyzing methodology section", "LinkedInCreator is crafting engaging content"]
     )
     
     result: Optional[LinkedInPost] = Field(

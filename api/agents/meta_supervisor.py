@@ -6,10 +6,10 @@ from typing import Dict, Any
 from langgraph.graph import END, StateGraph
 from langchain_core.messages import HumanMessage
 
-from app.models.state import LinkedInMetaState
-from app.agents.helpers import create_team_supervisor, get_llm, get_last_message, join_graph
-from app.agents.content_team import content_chain
-from app.agents.verification_team import verification_chain
+from api.models.state import LinkedInMetaState
+from api.agents.helpers import create_team_supervisor, get_llm, get_last_message, join_graph
+from api.agents.content_team import content_chain
+from api.agents.verification_team import verification_chain
 
 
 def create_linkedin_meta_graph():

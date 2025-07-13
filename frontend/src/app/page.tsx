@@ -7,7 +7,6 @@ import {
   Target, 
   MessageSquare, 
   CheckCircle, 
-  Clock,
   Share2,
   Copy,
   ExternalLink
@@ -25,7 +24,8 @@ import {
   CardFooter 
 } from '@/components/ui/card';
 import { generatePost, pollTaskStatus } from '@/lib/api-client';
-import { PostForm, PostStatusResponse, LinkedInPost } from '@/types/api';
+import { PostForm, PostStatusResponse, LinkedInPost, TeamProgress } from '@/types/api';
+import DetailedStatus from '@/components/ui/detailed-status';
 import toast from 'react-hot-toast';
 
 export default function HomePage() {
@@ -36,10 +36,15 @@ export default function HomePage() {
     tone: 'professional',
   });
   const [isGenerating, setIsGenerating] = useState(false);
-  const [currentStep, setCurrentStep] = useState('');
   const [progress, setProgress] = useState(0);
   const [generatedPost, setGeneratedPost] = useState<LinkedInPost | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  // Enhanced status tracking
+  const [detailedStatus, setDetailedStatus] = useState('');
+  const [teams, setTeams] = useState<TeamProgress[]>([]);
+  const [currentTeam, setCurrentTeam] = useState<string>('');
+  const [phase, setPhase] = useState<string>('');
 
   const targetAudienceOptions = [
     { value: 'academic', label: 'Academic Researchers' },
@@ -80,7 +85,6 @@ export default function HomePage() {
     
     setIsGenerating(true);
     setGeneratedPost(null);
-    setCurrentStep('Initializing generation...');
     setProgress(0);
     
     try {
@@ -97,8 +101,21 @@ export default function HomePage() {
       await pollTaskStatus(
         response.task_id,
         (statusResponse: PostStatusResponse) => {
-          setCurrentStep(statusResponse.status.current_step);
           setProgress(statusResponse.status.progress);
+          
+          // Update enhanced status tracking
+          if (statusResponse.status.teams) {
+            setTeams(statusResponse.status.teams);
+          }
+          if (statusResponse.status.current_team) {
+            setCurrentTeam(statusResponse.status.current_team);
+          }
+          if (statusResponse.status.phase) {
+            setPhase(statusResponse.status.phase);
+          }
+          if (statusResponse.status.detailed_status) {
+            setDetailedStatus(statusResponse.status.detailed_status);
+          }
           
           if (statusResponse.status.status === 'completed' && statusResponse.result) {
             setGeneratedPost(statusResponse.result);
@@ -113,7 +130,6 @@ export default function HomePage() {
       toast.error('Failed to generate post. Please try again.');
     } finally {
       setIsGenerating(false);
-      setCurrentStep('');
       setProgress(0);
     }
   };
@@ -228,19 +244,13 @@ export default function HomePage() {
             </CardHeader>
             <CardContent>
               {isGenerating && (
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-2">
-                    <Clock className="h-4 w-4 text-primary animate-spin" />
-                    <span className="text-sm text-muted-foreground">{currentStep}</span>
-                  </div>
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div 
-                      className="bg-primary h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
-                  <p className="text-sm text-muted-foreground">{progress}% complete</p>
-                </div>
+                <DetailedStatus
+                  teams={teams}
+                  currentTeam={currentTeam}
+                  phase={phase}
+                  detailedStatus={detailedStatus}
+                  overallProgress={progress / 100}
+                />
               )}
 
               {generatedPost && (

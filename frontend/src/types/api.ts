@@ -50,11 +50,37 @@ export interface VerificationReport {
   recommendations: string[];
 }
 
+export interface AgentFeedback {
+  agent_name: string;
+  status: 'idle' | 'working' | 'completed' | 'error';
+  current_activity?: string;
+  progress: number;
+  findings?: string;
+  last_update: string;
+  error_message?: string;
+}
+
+export interface TeamProgress {
+  team_name: string;
+  status: 'pending' | 'in_progress' | 'completed' | 'failed';
+  progress: number;
+  current_focus?: string;
+  agents: AgentFeedback[];
+  team_findings?: string;
+  started_at?: string;
+  completed_at?: string;
+}
+
 export interface TaskStatus {
   task_id: string;
   status: 'pending' | 'in_progress' | 'completed' | 'failed';
   progress: number;
   current_step: string;
+  // New detailed agent feedback
+  teams: TeamProgress[];
+  current_team?: string;
+  phase?: string;
+  detailed_status?: string;
   estimated_completion: string;
   error_message?: string;
 }

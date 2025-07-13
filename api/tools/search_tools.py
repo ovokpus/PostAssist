@@ -1,7 +1,7 @@
 from typing import Annotated, List, Dict, Any, Optional
 from langchain_core.tools import tool
 from langchain_community.tools.tavily_search import TavilySearchResults
-from app.config import settings
+from api.config import settings
 import os
 
 

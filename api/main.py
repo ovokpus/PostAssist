@@ -27,7 +27,10 @@ from api.models.responses import (
     ErrorResponse,
     TaskStatus,
     LinkedInPost,
-    VerificationReport
+    VerificationReport,
+    AgentStatus,
+    AgentFeedback,
+    TeamProgress
 )
 
 
@@ -126,6 +129,121 @@ async def update_task_status(task_id: str, status: str, progress: float = None,
     await store_task(task_id, task_data)
 
 
+async def update_agent_status(task_id: str, agent_name: str, status: AgentStatus, 
+                            current_activity: str = None, progress: float = None, 
+                            findings: str = None, error_message: str = None):
+    """Update individual agent status within a task."""
+    task_data = await get_task(task_id) or {}
+    
+    # Initialize teams structure if not exists
+    if "teams" not in task_data:
+        task_data["teams"] = {}
+    
+    # Determine which team this agent belongs to
+    team_mapping = {
+        "PaperResearcher": "Content team",
+        "LinkedInCreator": "Content team", 
+        "TechVerifier": "Verification team",
+        "StyleChecker": "Verification team"
+    }
+    
+    team_name = team_mapping.get(agent_name, "Unknown team")
+    
+    # Initialize team if not exists
+    if team_name not in task_data["teams"]:
+        task_data["teams"][team_name] = {
+            "team_name": team_name,
+            "status": "pending",
+            "progress": 0.0,
+            "current_focus": None,
+            "agents": {},
+            "team_findings": None,
+            "started_at": None,
+            "completed_at": None
+        }
+    
+    # Update agent information
+    agent_data = {
+        "agent_name": agent_name,
+        "status": status.value,
+        "current_activity": current_activity,
+        "progress": progress or 0.0,
+        "findings": findings,
+        "last_update": datetime.utcnow().isoformat(),
+        "error_message": error_message
+    }
+    
+    task_data["teams"][team_name]["agents"][agent_name] = agent_data
+    
+    # Update team status based on agent statuses
+    team_agents = task_data["teams"][team_name]["agents"]
+    if all(agent["status"] == "completed" for agent in team_agents.values()):
+        task_data["teams"][team_name]["status"] = "completed"
+        task_data["teams"][team_name]["completed_at"] = datetime.utcnow().isoformat()
+    elif any(agent["status"] == "working" for agent in team_agents.values()):
+        task_data["teams"][team_name]["status"] = "in_progress"
+        if not task_data["teams"][team_name]["started_at"]:
+            task_data["teams"][team_name]["started_at"] = datetime.utcnow().isoformat()
+    elif any(agent["status"] == "error" for agent in team_agents.values()):
+        task_data["teams"][team_name]["status"] = "failed"
+    
+    # Calculate team progress as average of agent progress
+    if team_agents:
+        team_progress = sum(agent["progress"] for agent in team_agents.values()) / len(team_agents)
+        task_data["teams"][team_name]["progress"] = team_progress
+    
+    # Update overall task detailed status
+    if status == AgentStatus.WORKING and current_activity:
+        task_data["detailed_status"] = f"{agent_name} is {current_activity.lower()}"
+        task_data["current_team"] = team_name
+    
+    await store_task(task_id, task_data)
+
+
+async def update_team_focus(task_id: str, team_name: str, current_focus: str, phase: str = None):
+    """Update what a team is currently focused on."""
+    task_data = await get_task(task_id) or {}
+    
+    if "teams" not in task_data:
+        task_data["teams"] = {}
+    
+    if team_name not in task_data["teams"]:
+        task_data["teams"][team_name] = {
+            "team_name": team_name,
+            "status": "in_progress",
+            "progress": 0.0,
+            "current_focus": current_focus,
+            "agents": {},
+            "team_findings": None,
+            "started_at": datetime.utcnow().isoformat(),
+            "completed_at": None
+        }
+    else:
+        task_data["teams"][team_name]["current_focus"] = current_focus
+    
+    # Update overall task phase and current team
+    if phase:
+        task_data["phase"] = phase
+    task_data["current_team"] = team_name
+    task_data["detailed_status"] = f"{team_name} is {current_focus.lower()}"
+    
+    await store_task(task_id, task_data)
+
+
+async def complete_team(task_id: str, team_name: str, team_findings: str = None):
+    """Mark a team as completed with their findings."""
+    task_data = await get_task(task_id) or {}
+    
+    if "teams" in task_data and team_name in task_data["teams"]:
+        task_data["teams"][team_name]["status"] = "completed"
+        task_data["teams"][team_name]["completed_at"] = datetime.utcnow().isoformat()
+        if team_findings:
+            task_data["teams"][team_name]["team_findings"] = team_findings
+        task_data["teams"][team_name]["progress"] = 1.0
+    
+    await store_task(task_id, task_data)
+
+
 @app.on_event("startup")
 async def startup_event():
     """Initialize application on startup."""
@@ -198,10 +316,19 @@ async def run_post_generation_task(task_id: str, request: PostGenerationRequest)
     try:
         await update_task_status(task_id, TaskStatus.IN_PROGRESS, 0.1, "starting")
         
+        # Initialize workflow with detailed tracking
+        await update_team_focus(task_id, "Content team", "Preparing to research ML paper", "initialization")
+        await update_agent_status(task_id, "PaperResearcher", AgentStatus.IDLE, "Waiting for assignment")
+        await update_agent_status(task_id, "LinkedInCreator", AgentStatus.IDLE, "Waiting for research data")
+        await update_agent_status(task_id, "TechVerifier", AgentStatus.IDLE, "Standing by for verification")
+        await update_agent_status(task_id, "StyleChecker", AgentStatus.IDLE, "Ready for style review")
+        
         # Import here to avoid circular imports
         from api.agents.meta_supervisor import run_linkedin_post_generation
         
         await update_task_status(task_id, TaskStatus.IN_PROGRESS, 0.2, "researching_paper")
+        await update_team_focus(task_id, "Content team", "Starting research on ML paper", "research")
+        await update_agent_status(task_id, "PaperResearcher", AgentStatus.WORKING, "Searching for paper information", 0.1)
         
         # Run the LinkedIn post generation
         result = run_linkedin_post_generation(
@@ -279,7 +406,7 @@ async def generate_linkedin_post(
 
 @app.get("/status/{task_id}", response_model=PostStatusResponse)
 async def get_post_status(task_id: str):
-    """Get the status of a LinkedIn post generation task."""
+    """Get the status of a LinkedIn post generation task with detailed agent feedback."""
     task_data = await get_task(task_id)
     
     if not task_data:
@@ -297,11 +424,47 @@ async def get_post_status(task_id: str):
     if task_data.get("result"):
         result = LinkedInPost(**task_data["result"])
     
+    # Build detailed team progress information
+    teams = []
+    teams_data = task_data.get("teams", {})
+    
+    for team_name, team_info in teams_data.items():
+        # Convert agent data to AgentFeedback models
+        agents = []
+        for agent_name, agent_info in team_info.get("agents", {}).items():
+            agent_feedback = AgentFeedback(
+                agent_name=agent_info.get("agent_name", agent_name),
+                status=AgentStatus(agent_info.get("status", "idle")),
+                current_activity=agent_info.get("current_activity"),
+                progress=agent_info.get("progress", 0.0),
+                findings=agent_info.get("findings"),
+                last_update=datetime.fromisoformat(agent_info.get("last_update", datetime.utcnow().isoformat())),
+                error_message=agent_info.get("error_message")
+            )
+            agents.append(agent_feedback)
+        
+        # Create TeamProgress model
+        team_progress = TeamProgress(
+            team_name=team_info.get("team_name", team_name),
+            status=TaskStatus(team_info.get("status", "pending")),
+            progress=team_info.get("progress", 0.0),
+            current_focus=team_info.get("current_focus"),
+            agents=agents,
+            team_findings=team_info.get("team_findings"),
+            started_at=datetime.fromisoformat(team_info["started_at"]) if team_info.get("started_at") else None,
+            completed_at=datetime.fromisoformat(team_info["completed_at"]) if team_info.get("completed_at") else None
+        )
+        teams.append(team_progress)
+    
     return PostStatusResponse(
         task_id=task_id,
         status=TaskStatus(task_data.get("status", TaskStatus.PENDING)),
         progress=task_data.get("progress", 0.0),
         current_step=task_data.get("current_step"),
+        teams=teams,
+        current_team=task_data.get("current_team"),
+        phase=task_data.get("phase"),
+        detailed_status=task_data.get("detailed_status"),
         result=result,
         error_message=task_data.get("error"),
         created_at=created_at,
