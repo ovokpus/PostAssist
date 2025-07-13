@@ -4,7 +4,8 @@ import functools
 from typing import Any, Callable, List, Optional, TypedDict, Union
 
 from langchain.agents import AgentExecutor, create_openai_functions_agent
-from langchain.output_parsers.openai_functions import JsonOutputFunctionsParser
+from langchain_core.output_parsers import PydanticOutputParser
+from langchain_core.pydantic_v1 import BaseModel, Field
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from langchain_core.runnables import Runnable
@@ -12,7 +13,7 @@ from langchain_core.tools import BaseTool
 from langchain_openai import ChatOpenAI
 
 from langgraph.graph import END, StateGraph
-from app.config import settings
+from api.config import settings
 
 
 def agent_node(state, agent, name):
@@ -69,6 +70,11 @@ def create_agent(
     return executor
 
 
+class RouteSchema(BaseModel):
+    """Schema for routing decisions."""
+    next: str = Field(description="Next team member to route to or 'FINISH'")
+
+
 def create_team_supervisor(llm: ChatOpenAI, system_prompt: str, members: List[str]) -> Runnable:
     """
     Create an LLM-based router/supervisor for a team of agents.
@@ -83,41 +89,33 @@ def create_team_supervisor(llm: ChatOpenAI, system_prompt: str, members: List[st
     """
     options = ["FINISH"] + members
     
-    # Define the function for routing decisions
-    function_def = {
-        "name": "route",
-        "description": "Select the next role.",
-        "parameters": {
-            "title": "routeSchema",
-            "type": "object",
-            "properties": {
-                "next": {
-                    "title": "Next",
-                    "anyOf": [
-                        {"enum": options},
-                    ],
-                },
-            },
-            "required": ["next"],
-        },
-    }
-    
-    # Create the prompt template
+    # Create the prompt template with format instructions
     prompt = ChatPromptTemplate.from_messages([
-        ("system", system_prompt),
+        ("system", system_prompt + "\n\nYou must respond with a JSON object containing a 'next' field."),
         MessagesPlaceholder(variable_name="messages"),
         (
             "system",
             "Given the conversation above, who should act next?"
-            " Or should we FINISH? Select one of: {options}",
+            " Or should we FINISH? Select one of: {options}\n"
+            "Respond in this exact format: {{\"next\": \"OPTION_NAME\"}}",
         ),
     ]).partial(options=str(options), team_members=", ".join(members))
     
-    return (
-        prompt
-        | llm.bind_tools([function_def], tool_choice="route")
-        | JsonOutputFunctionsParser()
-    )
+    def parse_response(response):
+        """Parse the LLM response to extract routing decision."""
+        content = response.content.strip()
+        try:
+            import json
+            parsed = json.loads(content)
+            return {"next": parsed.get("next", "FINISH")}
+        except:
+            # Fallback: try to extract from text
+            for option in options:
+                if option.upper() in content.upper():
+                    return {"next": option}
+            return {"next": "FINISH"}
+    
+    return prompt | llm | parse_response
 
 
 def get_llm() -> ChatOpenAI:

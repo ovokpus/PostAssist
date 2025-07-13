@@ -6,10 +6,10 @@ from typing import List
 from langgraph.graph import END, StateGraph
 from langchain_core.messages import HumanMessage
 
-from app.models.state import ContentTeamState
-from app.tools.search_tools import research_ml_paper, tavily_tool
-from app.tools.linkedin_tools import create_linkedin_post
-from app.agents.helpers import create_agent, create_team_supervisor, get_llm, create_partial_agent_node
+from api.models.state import ContentTeamState
+from api.tools.search_tools import research_ml_paper, tavily_tool
+from api.tools.linkedin_tools import create_linkedin_post
+from api.agents.helpers import create_agent, create_team_supervisor, get_llm, create_partial_agent_node
 
 
 def create_content_team_graph():

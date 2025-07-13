@@ -6,10 +6,10 @@ from typing import List
 from langgraph.graph import END, StateGraph
 from langchain_core.messages import HumanMessage
 
-from app.models.state import VerificationTeamState
-from app.tools.linkedin_tools import verify_technical_accuracy, check_linkedin_style
-from app.tools.search_tools import research_ml_paper
-from app.agents.helpers import create_agent, create_team_supervisor, get_llm, create_partial_agent_node
+from api.models.state import VerificationTeamState
+from api.tools.linkedin_tools import verify_technical_accuracy, check_linkedin_style
+from api.tools.search_tools import research_ml_paper
+from api.agents.helpers import create_agent, create_team_supervisor, get_llm, create_partial_agent_node
 
 
 def create_verification_team_graph():
