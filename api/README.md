@@ -4,6 +4,7 @@ A FastAPI backend that uses multi-agent LangGraph workflows to generate engaging
 
 ## 🚀 Features
 
+### Core Functionality
 - **Multi-Agent System**: Hierarchical team structure with content creation and verification teams
 - **Research Automation**: Automatically researches ML papers using web search and Tavily
 - **LinkedIn Optimization**: Creates posts optimized for LinkedIn engagement
@@ -11,6 +12,14 @@ A FastAPI backend that uses multi-agent LangGraph workflows to generate engaging
 - **Async Processing**: Background task processing with status tracking
 - **Batch Operations**: Generate multiple posts in batch with scheduling
 - **RESTful API**: Clean REST endpoints with OpenAPI documentation
+
+### New Features (Latest Release)
+- **Task Management**: GET /tasks endpoint for retrieving all task history
+- **Enhanced Status Tracking**: Real-time progress updates with agent feedback
+- **Improved Error Handling**: Comprehensive error management with user-friendly messages
+- **Redis Integration**: Task persistence and real-time status updates
+- **Frontend Integration**: Full-stack solution with React/TypeScript frontend
+- **Task Monitoring**: Comprehensive dashboard for tracking all generation tasks
 
 ## 📋 System Architecture
 
@@ -126,6 +135,34 @@ Check the status of a post generation task.
   "created_at": "2024-01-15T10:00:00Z",
   "updated_at": "2024-01-15T10:03:00Z"
 }
+```
+
+#### `GET /tasks`
+Retrieve all task history and status information.
+
+**Response:**
+```json
+[
+  {
+    "task_id": "123e4567-e89b-12d3-a456-426614174000",
+    "status": "completed",
+    "progress": 1.0,
+    "current_step": "completed",
+    "request_data": {
+      "paper_title": "Attention Is All You Need",
+      "target_audience": "professional",
+      "tone": "professional"
+    },
+    "result": {
+      "content": "Generated LinkedIn post...",
+      "hashtags": ["#MachineLearning", "#AI"],
+      "word_count": 150,
+      "character_count": 890
+    },
+    "created_at": "2024-01-15T10:00:00Z",
+    "updated_at": "2024-01-15T10:03:00Z"
+  }
+]
 ```
 
 #### `POST /verify-post`
