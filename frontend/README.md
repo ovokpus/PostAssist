@@ -24,8 +24,10 @@ A modern, responsive React/TypeScript frontend for PostAssist - AI-powered Linke
 - **Post Generation**: AI-powered LinkedIn post creation from ML paper titles
 - **Real-time Updates**: Live progress tracking during post generation
 - **Multi-agent Verification**: Technical accuracy and style verification
-- **Batch Processing**: Generate multiple posts simultaneously
-- **Post Verification**: Standalone post verification tool
+- **Batch Processing**: Generate multiple posts simultaneously with individual configuration
+- **Post Verification**: Standalone post verification tool with detailed analysis
+- **Task Monitoring**: Comprehensive dashboard for tracking all generation tasks
+- **Data Export**: CSV export for batch results and verification reports
 
 ### User Experience
 - **Responsive Design**: Mobile-first, works on all devices
@@ -183,6 +185,9 @@ getTaskStatus(taskId: string): Promise<PostStatusResponse>
 // Poll task status
 pollTaskStatus(taskId: string, onUpdate?: Function): Promise<PostStatusResponse>
 
+// Get all tasks
+getAllTasks(): Promise<PostStatusResponse[]>
+
 // Verify post
 verifyPost(request: PostVerificationRequest): Promise<PostVerificationResponse>
 
@@ -248,13 +253,65 @@ const result = await pollTaskStatus(response.task_id, (status) => {
 - Post preview with formatting
 - Action buttons for copy/share
 
-### Future Pages
+### Batch Page (`/batch`)
 
-- **Batch Generation** (`/batch`): Multiple post generation
-- **Post Verification** (`/verify`): Standalone verification tool
-- **Status Dashboard** (`/status`): Task monitoring
-- **Analytics** (`/analytics`): Usage metrics
-- **Settings** (`/settings`): User preferences
+**Bulk Post Generation** - Create multiple LinkedIn posts simultaneously
+
+**Features:**
+- Multi-item form with add/remove functionality
+- Individual configuration per post (title, context, audience, tone)
+- Real-time progress tracking during bulk generation
+- Results display with copy/clipboard functionality
+- CSV export for batch results
+- Comprehensive error handling and validation
+
+**Components Used:**
+- Dynamic form arrays for multiple posts
+- Progress indicators for each post
+- Batch results table with actions
+- Export functionality
+
+### Status Page (`/status`)
+
+**Task Monitoring Dashboard** - Monitor all generation tasks
+
+**Features:**
+- Dashboard with statistics (total, completed, in-progress, failed)
+- Task history table with search and filtering
+- Auto-refresh toggle for real-time monitoring
+- Task details panel with comprehensive status
+- Connected to real API data
+
+**Components Used:**
+- Statistics cards with real-time data
+- Filterable task table
+- Auto-refresh mechanism
+- Task detail modal/panel
+
+### Verify Page (`/verify`)
+
+**Post Verification Tool** - Standalone verification for existing posts
+
+**Features:**
+- Verification form with paper title and content input
+- Verification type selection (Technical & Style, Technical Only, Style Only)
+- Real-time character and word count tracking
+- Detailed results with scoring breakdown
+- Verification report with recommendations
+- Report download functionality
+
+**Components Used:**
+- Verification form with text analysis
+- Progress indicators during verification
+- Results display with scoring
+- Download functionality
+
+### Future Enhancements
+
+- **Analytics** (`/analytics`): Usage metrics and insights
+- **Settings** (`/settings`): User preferences and configuration
+- **History** (`/history`): Extended task history with analytics
+- **Teams** (`/teams`): Multi-user collaboration features
 
 ## 🎨 Styling
 

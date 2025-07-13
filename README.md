@@ -4,57 +4,133 @@ AI-powered LinkedIn post generation for machine learning papers with multi-agent
 
 📊 **[View Full Business Case](./BUSINESS_CASE.md)**
 
-## A Multi-Agent LinkedIn Post Generation
+## A Complete Multi-Agent LinkedIn Post Generation Platform
 
-**PostAssist** is an AI-powered assistant that generates engaging LinkedIn posts about machine learning research papers. This complete **FastAPI backend** uses a sophisticated multi-agent system powered by **LangGraph** to research, create, and verify high-quality content.
+**PostAssist** is a full-stack AI-powered platform that generates engaging LinkedIn posts about machine learning research papers. It features a **Next.js frontend** with multiple specialized pages and a **FastAPI backend** using a sophisticated multi-agent system powered by **LangGraph** to research, create, and verify high-quality content.
+
+## 🎨 Frontend Features
+
+### 📄 Complete Page Suite
+- **📝 Generate Page**: Interactive form for single post generation with real-time progress tracking and agent feedback
+- **⚡ Batch Page**: Bulk generation of multiple posts with individual configuration, progress monitoring, and CSV export
+- **📊 Status Page**: Comprehensive dashboard for monitoring all tasks with statistics, search, filtering, and task history
+- **🔍 Verify Page**: Standalone post verification tool with technical accuracy and style compliance checking
+
+### 🛠 Advanced Functionality
+- **🔄 Real-time Updates**: Live progress tracking with agent team feedback during generation
+- **📈 Task Management**: Complete task lifecycle management with status tracking and history
+- **💾 Data Export**: CSV export for batch results and verification reports
+- **🌓 Theme Support**: Complete light/dark mode compatibility across all pages
+- **📱 Responsive Design**: Mobile-friendly interface with modern UI components
+- **🎯 Error Handling**: Comprehensive error handling with user-friendly messages and retry logic
 
 ## 🚀 Quick Start
 
-### Option 1: Docker (Recommended)
+### Option 1: Full Stack (Frontend + Backend)
 
 ```bash
 # Clone and setup
 git clone <repository-url>
-cd 06_Multi_Agent_with_LangGraph
+cd PostAssist
 
-# Create environment file
+# Backend setup
+cd api
 cp .env.example .env
-# Edit .env with your API keys
+# Edit .env with your API keys (OPENAI_API_KEY, TAVILY_API_KEY)
+python main.py
 
-# Start with Docker Compose
-docker-compose up
+# Frontend setup (new terminal)
+cd frontend
+npm install
+npm run dev
+
+# Access the application
+# Frontend: http://localhost:3000
+# Backend API: http://localhost:8000
+# API Documentation: http://localhost:8000/docs
 ```
 
-### Option 2: Manual Setup
+### Option 2: Docker (Recommended)
+
+```bash
+# Start both frontend and backend with Docker Compose
+docker-compose up
+
+# Access the application
+# Frontend: http://localhost:3000
+# Backend API: http://localhost:8000
+# API Documentation: http://localhost:8000/docs
+```
+
+## 📱 Application Pages
+
+### 🏠 Generate Page (`/`)
+**Single Post Generation** - The main interface for creating individual LinkedIn posts
+- **Interactive Form**: Paper title, context, audience, and tone selection
+- **Real-time Progress**: Live agent feedback during generation process
+- **Instant Results**: Generated post with engagement metrics and copy functionality
+- **LinkedIn Integration**: Direct share to LinkedIn with optimized formatting
+
+### ⚡ Batch Page (`/batch`) 
+**Bulk Post Generation** - Create multiple posts simultaneously
+- **Multi-item Management**: Add/remove posts with individual configurations
+- **Progress Monitoring**: Real-time progress tracking for all posts
+- **Results Dashboard**: Comprehensive results with copy and CSV export
+- **Error Handling**: Individual post error handling with retry options
+
+### 📊 Status Page (`/status`)
+**Task Monitoring Dashboard** - Monitor all generation tasks
+- **Statistics Overview**: Total tasks, completion rates, and performance metrics
+- **Task History**: Complete task log with search and filtering capabilities
+- **Real-time Updates**: Auto-refresh with live status updates
+- **Task Details**: Detailed view of each task with full metadata
+
+### 🔍 Verify Page (`/verify`)
+**Post Verification Tool** - Standalone verification for existing posts
+- **Verification Types**: Technical accuracy, style compliance, or comprehensive review
+- **Detailed Analysis**: Scoring breakdown with specific recommendations
+- **Character/Word Count**: Real-time content metrics
+- **Report Export**: Download verification reports for record-keeping
+
+### Option 3: Backend Only (API Mode)
 
 ```bash
 # Make start script executable and run
 chmod +x start.sh
 ./start.sh
-```
 
-### Option 3: Development Mode
-
-```bash
-# Setup development environment
+# Or manual setup
 python scripts/dev.py setup
-
-# Start development server with hot reload
 python scripts/dev.py run
 ```
 
-## 📖 API Documentation
+## 📖 Application Access
 
 Once running, visit:
-- **Interactive API Docs**: http://localhost:8000/docs
-- **Alternative Docs**: http://localhost:8000/redoc
+- **Frontend Application**: http://localhost:3000 (Main user interface)
+- **Interactive API Docs**: http://localhost:8000/docs (Backend API documentation)
+- **Alternative API Docs**: http://localhost:8000/redoc
 - **Health Check**: http://localhost:8000/health
 
 ## 🏗 Project Structure
 
 ```
-06_Multi_Agent_with_LangGraph/
-├── app/                          # FastAPI Backend Application
+PostAssist/
+├── frontend/                     # Next.js Frontend Application
+│   ├── src/
+│   │   ├── app/                  # App Router pages
+│   │   │   ├── page.tsx          # Generate page (main interface)
+│   │   │   ├── batch/page.tsx    # Batch generation page
+│   │   │   ├── status/page.tsx   # Task monitoring dashboard
+│   │   │   └── verify/page.tsx   # Post verification page
+│   │   ├── components/           # Reusable UI components
+│   │   │   ├── layout/           # Layout components
+│   │   │   └── ui/               # Base UI components
+│   │   ├── lib/                  # Utilities and API client
+│   │   └── types/                # TypeScript type definitions
+│   ├── package.json              # Frontend dependencies
+│   └── tailwind.config.ts        # Tailwind CSS configuration
+├── api/                          # FastAPI Backend Application
 │   ├── main.py                   # FastAPI app with all endpoints
 │   ├── config.py                 # Configuration and settings
 │   ├── models/                   # Pydantic models
@@ -89,7 +165,8 @@ Once running, visit:
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `POST` | `/generate-post` | Generate LinkedIn post about ML paper |
-| `GET` | `/status/{task_id}` | Check task status and get results |
+| `GET` | `/status/{task_id}` | Check individual task status and results |
+| `GET` | `/tasks` | Get all tasks with their current status |
 | `POST` | `/verify-post` | Verify post technical accuracy & style |
 | `POST` | `/batch-generate` | Generate multiple posts in batch |
 | `GET` | `/health` | Health check and service status |
