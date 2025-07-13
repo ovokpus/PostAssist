@@ -2,6 +2,7 @@
 
 import uuid
 import asyncio
+import json
 from datetime import datetime, timedelta
 from typing import Dict, Any, Optional
 
@@ -28,6 +29,14 @@ from api.models.responses import (
     LinkedInPost,
     VerificationReport
 )
+
+
+def datetime_json_encoder(obj):
+    """JSON encoder function that handles datetime objects."""
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
+
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -304,7 +313,7 @@ async def verify_post(request: PostVerificationRequest):
     
     try:
         # Import verification tools
-        from app.tools.linkedin_tools import verify_technical_accuracy, check_linkedin_style
+        from api.tools.linkedin_tools import verify_technical_accuracy, check_linkedin_style
         
         verification_report = VerificationReport()
         
@@ -396,26 +405,32 @@ async def batch_generate_posts(
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request, exc):
     """Handle HTTP exceptions."""
+    error_response = ErrorResponse(
+        error="http_error",
+        message=exc.detail,
+        details={"status_code": exc.status_code}
+    )
+    # Use custom JSON encoder to handle datetime objects
+    content_data = json.loads(error_response.json())
     return JSONResponse(
         status_code=exc.status_code,
-        content=ErrorResponse(
-            error="http_error",
-            message=exc.detail,
-            details={"status_code": exc.status_code}
-        ).dict()
+        content=content_data
     )
 
 
 @app.exception_handler(Exception)
 async def general_exception_handler(request, exc):
     """Handle general exceptions."""
+    error_response = ErrorResponse(
+        error="internal_error",
+        message="An unexpected error occurred",
+        details={"exception": str(exc)}
+    )
+    # Use custom JSON encoder to handle datetime objects
+    content_data = json.loads(error_response.json())
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content=ErrorResponse(
-            error="internal_error",
-            message="An unexpected error occurred",
-            details={"exception": str(exc)}
-        ).dict()
+        content=content_data
     )
 
 
