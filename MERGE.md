@@ -1,143 +1,66 @@
-# 📋 Merge Instructions - Business Case Separation
+# Merge Instructions
 
-## Overview
-This feature branch (`feature/business-case-separation`) contains the refactoring of the business case content from `README.md` into a dedicated `BUSINESS_CASE.md` file.
+## Branch: `fix-frontend-api-types`
 
-## Changes Made
-- ✅ Extracted comprehensive business case section from `README.md`
-- ✅ Created dedicated `BUSINESS_CASE.md` file with full market analysis
-- ✅ Updated `README.md` to include link to business case document
-- ✅ Improved documentation organization and readability
+### Summary
+Fixed critical frontend API type mismatches and infinite toast notification issue that was preventing proper display of streaming updates.
 
-## Files Modified
-- `README.md` - Removed business case content, added link to dedicated file
-- `BUSINESS_CASE.md` - **NEW FILE** - Complete business case documentation
+### Changes Made
+1. **Fixed API Type Mismatches**: Updated `PostStatusResponse` and `LinkedInPost` interfaces to match actual backend API structure
+2. **Fixed Streaming Display**: Frontend now properly shows real-time progress, team activities, and agent status
+3. **Prevented Duplicate Toasts**: Added completion flag to stop infinite "Post generated successfully!" notifications
+4. **Updated Post Display**: Adjusted UI to show actual available fields (word_count, character_count, engagement_score)
 
-## Merge Options
+### Files Modified
+- `frontend/src/types/api.ts` - Fixed API response interfaces
+- `frontend/src/app/page.tsx` - Updated polling logic and toast handling
 
-### Option 1: GitHub Pull Request (Recommended)
+### Testing
+- ✅ Frontend now displays streaming updates correctly (progress %, team activities, agent status)
+- ✅ Toast notifications only appear once per generation
+- ✅ Generated posts display with correct field data
+- ✅ Real-time multi-agent feedback works end-to-end
 
-1. **Push the feature branch to remote:**
-   ```bash
-   git push origin feature/business-case-separation
-   ```
+### How to Merge
 
-2. **Create Pull Request:**
-   - Navigate to GitHub repository
-   - Click "New Pull Request"
-   - Select `feature/business-case-separation` → `main`
-   - Title: "Move business case content to dedicated BUSINESS_CASE.md file"
-   - Description: Include the changes summary above
-   - Request review from team members
+#### Option 1: GitHub Pull Request
+```bash
+git push origin fix-frontend-api-types
+```
+Then create a PR on GitHub from `fix-frontend-api-types` → `main`
 
-3. **Merge via GitHub UI:**
-   - After approval, use "Squash and merge" option
-   - Delete the feature branch after merge
+#### Option 2: GitHub CLI
+```bash
+# Push the branch
+git push origin fix-frontend-api-types
 
-### Option 2: GitHub CLI
+# Create and merge PR via GitHub CLI
+gh pr create --title "Fix frontend API types and prevent duplicate toast notifications" \
+  --body "Fixes critical type mismatches between frontend and backend API that prevented streaming updates from displaying properly. Also prevents infinite toast notifications." \
+  --base main --head fix-frontend-api-types
 
-1. **Push the feature branch:**
-   ```bash
-   git push origin feature/business-case-separation
-   ```
+# Merge the PR (after review)
+gh pr merge --merge
+```
 
-2. **Create PR using GitHub CLI:**
-   ```bash
-   gh pr create --title "Move business case content to dedicated BUSINESS_CASE.md file" \
-     --body "Extracted comprehensive business case section from README.md into dedicated BUSINESS_CASE.md file. Improves documentation organization and readability." \
-     --base main --head feature/business-case-separation
-   ```
+#### Option 3: Direct Merge (if no review needed)
+```bash
+git checkout main
+git merge fix-frontend-api-types
+git push origin main
+git branch -d fix-frontend-api-types
+git push origin --delete fix-frontend-api-types
+```
 
-3. **Merge using GitHub CLI:**
-   ```bash
-   gh pr merge --squash --delete-branch
-   ```
+### Verification Steps After Merge
+1. Start the frontend: `cd frontend && npm run dev`
+2. Generate a test post and verify:
+   - Progress shows actual percentages (not "NaN%")
+   - Team activities display with agent details
+   - Only one success/failure toast appears
+   - Generated post displays correctly
 
-### Option 3: Direct Git Merge (Development Only)
-
-⚠️ **Use only for development/testing - not recommended for production**
-
-1. **Switch to main branch:**
-   ```bash
-   git checkout main
-   ```
-
-2. **Pull latest changes:**
-   ```bash
-   git pull origin main
-   ```
-
-3. **Merge feature branch:**
-   ```bash
-   git merge feature/business-case-separation
-   ```
-
-4. **Push changes:**
-   ```bash
-   git push origin main
-   ```
-
-5. **Clean up feature branch:**
-   ```bash
-   git branch -d feature/business-case-separation
-   git push origin --delete feature/business-case-separation
-   ```
-
-## Testing Before Merge
-
-1. **Verify documentation links:**
-   - Check that the link to `BUSINESS_CASE.md` works correctly
-   - Ensure all content is properly formatted
-
-2. **Review file structure:**
-   - Confirm `BUSINESS_CASE.md` contains complete business case
-   - Verify `README.md` maintains technical documentation focus
-
-3. **Check for completeness:**
-   - Ensure no business case content remains in `README.md`
-   - Verify all sections are properly transferred
-
-## Post-Merge Actions
-
-1. **Update local main branch:**
-   ```bash
-   git checkout main
-   git pull origin main
-   ```
-
-2. **Clean up local feature branch:**
-   ```bash
-   git branch -d feature/business-case-separation
-   ```
-
-3. **Verify deployment:**
-   - Check that documentation renders correctly
-   - Confirm links work in the deployed environment
-
-## Branch Information
-
-- **Feature Branch**: `feature/business-case-separation`
-- **Base Branch**: `main`
-- **Commit Hash**: `8da2229`
-- **Files Changed**: 2 files (README.md, BUSINESS_CASE.md)
-- **Lines Added**: 570+
-- **Lines Removed**: 285+
-
-## Review Checklist
-
-- [ ] Business case content completely moved to `BUSINESS_CASE.md`
-- [ ] README.md updated with proper link to business case
-- [ ] No duplicate content between files
-- [ ] All formatting maintained and improved
-- [ ] Documentation structure is cleaner and more organized
-- [ ] Links work correctly in both local and deployed environments
-
-## Notes
-
-This refactoring improves the project's documentation structure by:
-- Separating business concerns from technical documentation
-- Making the README more focused on implementation details
-- Providing dedicated space for comprehensive business analysis
-- Improving overall readability and navigation
-
-**Recommended merge method**: GitHub Pull Request with squash merge 
+### Impact
+- **Critical Fix**: Frontend now properly communicates with backend streaming API
+- **UX Improvement**: Users see real-time multi-agent progress instead of "black box" waiting
+- **No Breaking Changes**: Backend API unchanged, only frontend types fixed 
