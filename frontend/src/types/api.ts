@@ -103,6 +103,7 @@ export interface PostStatusResponse {
   result?: LinkedInPost;
   verification?: VerificationReport;
   error_message?: string;
+  request_data?: PostGenerationRequest;
   created_at: string;
   updated_at: string;
 }

@@ -4,7 +4,7 @@ import uuid
 import asyncio
 import json
 from datetime import datetime, timedelta
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -242,6 +242,35 @@ async def complete_team(task_id: str, team_name: str, team_findings: str = None)
         task_data["teams"][team_name]["progress"] = 1.0
     
     await store_task(task_id, task_data)
+
+
+async def get_all_tasks() -> List[Dict[str, Any]]:
+    """Retrieve all tasks from Redis or fallback storage."""
+    client = await get_redis_client()
+    all_tasks = []
+    
+    if client:
+        try:
+            # Get all task keys from Redis
+            keys = await client.keys("task:*")
+            for key in keys:
+                data = await client.get(key)
+                if data:
+                    try:
+                        task_data = json.loads(data.decode())
+                        all_tasks.append(task_data)
+                    except json.JSONDecodeError:
+                        continue
+        except Exception:
+            # Fall back to in-memory storage
+            all_tasks = list(task_storage.values())
+    else:
+        # Use in-memory storage
+        all_tasks = list(task_storage.values())
+    
+    # Sort by creation date (newest first)
+    all_tasks.sort(key=lambda x: x.get("created_at", ""), reverse=True)
+    return all_tasks
 
 
 @app.on_event("startup")
@@ -598,9 +627,78 @@ async def get_post_status(task_id: str):
         detailed_status=task_data.get("detailed_status"),
         result=result,
         error_message=task_data.get("error"),
+        request_data=task_data.get("request_data"),
         created_at=created_at,
         updated_at=updated_at
     )
+
+
+@app.get("/tasks", response_model=List[PostStatusResponse])
+async def get_all_tasks_endpoint():
+    """Get all tasks with their current status."""
+    all_tasks_data = await get_all_tasks()
+    
+    tasks = []
+    for task_data in all_tasks_data:
+        # Parse dates
+        created_at = datetime.fromisoformat(task_data.get("created_at", datetime.utcnow().isoformat()))
+        updated_at = datetime.fromisoformat(task_data.get("updated_at", datetime.utcnow().isoformat()))
+        
+        # Create LinkedIn post if result exists
+        result = None
+        if task_data.get("result"):
+            result = LinkedInPost(**task_data["result"])
+        
+        # Build detailed team progress information
+        teams = []
+        teams_data = task_data.get("teams", {})
+        
+        for team_name, team_info in teams_data.items():
+            # Convert agent data to AgentFeedback models
+            agents = []
+            for agent_name, agent_info in team_info.get("agents", {}).items():
+                agent_feedback = AgentFeedback(
+                    agent_name=agent_info.get("agent_name", agent_name),
+                    status=AgentStatus(agent_info.get("status", "idle")),
+                    current_activity=agent_info.get("current_activity"),
+                    progress=agent_info.get("progress", 0.0),
+                    findings=agent_info.get("findings"),
+                    last_update=datetime.fromisoformat(agent_info.get("last_update", datetime.utcnow().isoformat())),
+                    error_message=agent_info.get("error_message")
+                )
+                agents.append(agent_feedback)
+            
+            # Create TeamProgress model
+            team_progress = TeamProgress(
+                team_name=team_info.get("team_name", team_name),
+                status=TaskStatus(team_info.get("status", "pending")),
+                progress=team_info.get("progress", 0.0),
+                current_focus=team_info.get("current_focus"),
+                agents=agents,
+                team_findings=team_info.get("team_findings"),
+                started_at=datetime.fromisoformat(team_info["started_at"]) if team_info.get("started_at") else None,
+                completed_at=datetime.fromisoformat(team_info["completed_at"]) if team_info.get("completed_at") else None
+            )
+            teams.append(team_progress)
+        
+        task_response = PostStatusResponse(
+            task_id=task_data.get("task_id", ""),
+            status=TaskStatus(task_data.get("status", TaskStatus.PENDING)),
+            progress=task_data.get("progress", 0.0),
+            current_step=task_data.get("current_step"),
+            teams=teams,
+            current_team=task_data.get("current_team"),
+            phase=task_data.get("phase"),
+            detailed_status=task_data.get("detailed_status"),
+            result=result,
+            error_message=task_data.get("error"),
+            request_data=task_data.get("request_data"),
+            created_at=created_at,
+            updated_at=updated_at
+        )
+        tasks.append(task_response)
+    
+    return tasks
 
 
 @app.post("/verify-post", response_model=PostVerificationResponse)

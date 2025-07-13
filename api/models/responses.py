@@ -256,6 +256,11 @@ class PostStatusResponse(BaseModel):
         description="Error message (if failed)"
     )
     
+    request_data: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="Original request data for this task"
+    )
+    
     created_at: datetime = Field(
         default_factory=datetime.utcnow,
         description="Task creation timestamp"
