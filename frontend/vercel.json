@@ -1,9 +1,6 @@
 {
     "version": 2,
     "framework": "nextjs",
-    "env": {
-        "NEXT_PUBLIC_API_URL": "https://postassist-production.up.railway.app"
-    },
     "headers": [
         {
             "source": "/(.*)",
@@ -22,5 +19,10 @@
                 }
             ]
         }
-    ]
+    ],
+    "functions": {
+        "app/**": {
+            "maxDuration": 30
+        }
+    }
 } 
