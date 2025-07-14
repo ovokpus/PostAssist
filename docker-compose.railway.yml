@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  postassist:
+    build: .
+    ports:
+      - "${PORT:-8000}:${PORT:-8000}"
+    environment:
+      - PORT=${PORT:-8000}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - TAVILY_API_KEY=${TAVILY_API_KEY}
+      - REDIS_URL=${REDIS_URL:-redis://localhost:6379}
+      - DEBUG=${DEBUG:-false}
+      - RAILWAY_ENVIRONMENT=${RAILWAY_ENVIRONMENT:-production}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o-mini}
+      - OPENAI_TEMPERATURE=${OPENAI_TEMPERATURE:-0.7}
+    volumes:
+      - ./content:/app/content
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${PORT:-8000}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+# Note: Redis is provided as a managed service by Railway
+# No need to define it here - Railway will inject REDIS_URL automatically 
