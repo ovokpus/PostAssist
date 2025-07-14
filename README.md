@@ -2,6 +2,18 @@
 
 AI-powered LinkedIn post generation for machine learning papers with multi-agent verification
 
+## 🌐 **LIVE APPLICATION - DEPLOYED AND READY!** 🚀
+
+**✅ Frontend**: https://post-assist-1lmcezvbs-ovo-okpubulukus-projects.vercel.app  
+**✅ Backend**: https://postassist-production.up.railway.app  
+**📊 API Docs**: https://postassist-production.up.railway.app/docs  
+
+**📅 Status**: Successfully deployed July 2025  
+**⚡ Framework**: Next.js 15.3.5 on Vercel + FastAPI on Railway  
+**🔧 Features**: All pages live and functional - try it now!  
+
+---
+
 ## 📋 Documentation Navigation
 
 ### 🏠 Main Documentation
@@ -22,6 +34,7 @@ AI-powered LinkedIn post generation for machine learning papers with multi-agent
 ### 🔧 Component Documentation
 - **🔌 [API Documentation](./api/README.md)** - Backend API reference
 - **💻 [Frontend Documentation](./frontend/README.md)** - Frontend component guide
+- **🌐 [Vercel Deployment Guide](./docs/VERCEL_DEPLOYMENT_GUIDE.md)** - Frontend deployment to Vercel ✅ **COMPLETED**
 
 ---
 
