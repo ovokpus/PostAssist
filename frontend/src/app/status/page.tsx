@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Search, 
   RefreshCw, 
@@ -110,6 +110,19 @@ export default function StatusPage() {
     setFilteredTasks(filtered);
   }, [tasks, searchTerm, statusFilter]);
 
+  const refreshTasks = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      await loadTasks();
+      toast.success('Tasks refreshed');
+    } catch (error) {
+      console.error('Failed to refresh tasks:', error);
+      toast.error('Failed to refresh tasks');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [loadTasks]);
+
   useEffect(() => {
     let interval: NodeJS.Timeout;
     
@@ -122,27 +135,15 @@ export default function StatusPage() {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [autoRefresh]);
-
-  const refreshTasks = async () => {
-    setIsLoading(true);
-    try {
-      await loadTasks();
-      toast.success('Tasks refreshed');
-    } catch (error) {
-      console.error('Failed to refresh tasks:', error);
-      toast.error('Failed to refresh tasks');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }, [autoRefresh, refreshTasks]);
 
   const handleTaskClick = async (taskId: string) => {
     setIsLoading(true);
     try {
       const taskStatus = await getTaskStatus(taskId);
       setSelectedTask(taskStatus);
-    } catch (_) {
+    } catch (error) {
+      console.error('Failed to load task details:', error);
       toast.error('Failed to load task details');
     } finally {
       setIsLoading(false);
