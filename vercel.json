@@ -1,0 +1,35 @@
+{
+    "version": 2,
+    "installCommand": "cd frontend && npm install",
+    "buildCommand": "cd frontend && npm run build",
+    "outputDirectory": "frontend/.next",
+    "framework": "nextjs",
+    "env": {
+        "NEXT_PUBLIC_API_BASE_URL": "https://postassist-production.up.railway.app"
+    },
+    "headers": [
+        {
+            "source": "frontend/(.*)",
+            "headers": [
+                {
+                    "key": "X-Content-Type-Options",
+                    "value": "nosniff"
+                },
+                {
+                    "key": "X-Frame-Options",
+                    "value": "DENY"
+                },
+                {
+                    "key": "X-XSS-Protection",
+                    "value": "1; mode=block"
+                }
+            ]
+        }
+    ],
+    "rewrites": [
+        {
+            "source": "frontend/(.*)",
+            "destination": "/$1"
+        }
+    ]
+}
