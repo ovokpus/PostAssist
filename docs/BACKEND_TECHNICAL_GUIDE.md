@@ -1,10 +1,28 @@
-# 🚀 PostAssist Backend Technical Guide
+# 🔧 Backend Technical Guide: PostAssist Architecture Deep Dive
 
-*A Complete Breakdown for Python Enthusiasts* 
+*A comprehensive guide to PostAssist's backend architecture, designed for a 15-year-old who knows Python but hasn't used FastAPI or async programming before.*
 
-Hey there, future coding wizard! 🧙‍♂️ Welcome to the most epic guide to understanding PostAssist's backend. We're going to dive deep into every single line of code and explain how this magical AI-powered LinkedIn post generator works. 
+## 📋 Documentation Navigation
 
-Think of this as your personal tour guide through a really cool Python codebase that uses some fancy technologies you might not know yet - but don't worry, we'll explain everything!
+### 🏠 Main Documentation
+- **📖 [README.md](../README.md)** - Project overview and getting started
+- **🔀 [MERGE.md](../MERGE.md)** - Branch management and merge instructions
+
+### 🛠️ Technical Guides
+- **🤖 [Agentic AI Guide](./AGENTIC_AI_GUIDE.md)** - Multi-agent system architecture and implementation
+- **⚙️ [Backend Technical Guide](./BACKEND_TECHNICAL_GUIDE.md)** - FastAPI backend deep dive
+- **🎨 [Frontend Technical Guide](./FRONTEND_TECHNICAL_GUIDE.md)** - Next.js frontend architecture
+
+### 📊 Configuration & Setup
+- **💼 [Business Case](./BUSINESS_CASE.md)** - Project rationale and market analysis
+- **⚡ [Cache Configuration](./CACHE_CONFIGURATION.md)** - Redis caching setup and optimization
+- **⏱️ [Timeout Fixes](./TIMEOUT_FIXES.md)** - Performance optimization and timeout handling
+
+### 🔧 Component Documentation
+- **🔌 [API Documentation](../api/README.md)** - Backend API reference
+- **💻 [Frontend Documentation](../frontend/README.md)** - Frontend component guide
+
+---
 
 ## 📚 Table of Contents
 

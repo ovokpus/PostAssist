@@ -1,10 +1,28 @@
-# 🌟 PostAssist Frontend Technical Guide
+# 🎨 Frontend Technical Guide: Next.js & React Deep Dive
 
-*A Complete Breakdown for Vibe-Coding Enthusiasts* 
+*A comprehensive guide to PostAssist's frontend architecture, designed for someone who's "vibe-coding" but wants to understand the technical magic behind the scenes.*
 
-Hey there, future frontend wizard! ✨ Welcome to the most comprehensive guide to understanding PostAssist's frontend. We're going to explore every single piece of this modern web application and explain how it all works together to create an amazing user experience.
+## 📋 Documentation Navigation
 
-Don't worry if you've never touched React, TypeScript, or any of these fancy frontend tools before - we'll explain everything from the ground up using simple analogies and real-world examples!
+### 🏠 Main Documentation
+- **📖 [README.md](../README.md)** - Project overview and getting started
+- **🔀 [MERGE.md](../MERGE.md)** - Branch management and merge instructions
+
+### 🛠️ Technical Guides
+- **🤖 [Agentic AI Guide](./AGENTIC_AI_GUIDE.md)** - Multi-agent system architecture and implementation
+- **⚙️ [Backend Technical Guide](./BACKEND_TECHNICAL_GUIDE.md)** - FastAPI backend deep dive
+- **🎨 [Frontend Technical Guide](./FRONTEND_TECHNICAL_GUIDE.md)** - Next.js frontend architecture
+
+### 📊 Configuration & Setup
+- **💼 [Business Case](./BUSINESS_CASE.md)** - Project rationale and market analysis
+- **⚡ [Cache Configuration](./CACHE_CONFIGURATION.md)** - Redis caching setup and optimization
+- **⏱️ [Timeout Fixes](./TIMEOUT_FIXES.md)** - Performance optimization and timeout handling
+
+### 🔧 Component Documentation
+- **🔌 [API Documentation](../api/README.md)** - Backend API reference
+- **💻 [Frontend Documentation](../frontend/README.md)** - Frontend component guide
+
+---
 
 ## 📚 Table of Contents
 

@@ -2,11 +2,39 @@
 
 AI-powered LinkedIn post generation for machine learning papers with multi-agent verification
 
+## 📋 Documentation Navigation
+
+### 🏠 Main Documentation
+- **📖 [README.md](./README.md)** - Project overview and getting started
+- **🔀 [MERGE.md](./MERGE.md)** - Branch management and merge instructions
+
+### 🛠️ Technical Guides
+- **🤖 [Agentic AI Guide](./docs/AGENTIC_AI_GUIDE.md)** - Multi-agent system architecture and implementation
+- **⚙️ [Backend Technical Guide](./docs/BACKEND_TECHNICAL_GUIDE.md)** - FastAPI backend deep dive
+- **🎨 [Frontend Technical Guide](./docs/FRONTEND_TECHNICAL_GUIDE.md)** - Next.js frontend architecture
+
+### 📊 Configuration & Setup
+- **💼 [Business Case](./docs/BUSINESS_CASE.md)** - Project rationale and market analysis
+- **⚡ [Cache Configuration](./docs/CACHE_CONFIGURATION.md)** - Redis caching setup and optimization
+- **⏱️ [Timeout Fixes](./docs/TIMEOUT_FIXES.md)** - Performance optimization and timeout handling
+
+### 🔧 Component Documentation
+- **🔌 [API Documentation](./api/README.md)** - Backend API reference
+- **💻 [Frontend Documentation](./frontend/README.md)** - Frontend component guide
+
+---
+
 📊 **[View Full Business Case](./BUSINESS_CASE.md)**
 
 ## A Complete Multi-Agent LinkedIn Post Generation Platform
 
 **PostAssist** is a full-stack AI-powered platform that generates engaging LinkedIn posts about machine learning research papers. It features a **Next.js frontend** with multiple specialized pages and a **FastAPI backend** using a sophisticated multi-agent system powered by **LangGraph** to research, create, and verify high-quality content.
+
+---
+
+![image](./img/agent-graph.png)
+
+---
 
 ## 🎨 Frontend Features
 

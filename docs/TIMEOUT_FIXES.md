@@ -1,6 +1,30 @@
-# 🔧 PostAssist Timeout & Concurrency Fixes
+# ⏱️ PostAssist Timeout Fixes Guide
 
-## 🎯 Problem Solved
+*Performance Optimization and Timeout Handling for AI Agent Workflows*
+
+## 📋 Documentation Navigation
+
+### 🏠 Main Documentation
+- **📖 [README.md](../README.md)** - Project overview and getting started
+- **🔀 [MERGE.md](../MERGE.md)** - Branch management and merge instructions
+
+### 🛠️ Technical Guides
+- **🤖 [Agentic AI Guide](./AGENTIC_AI_GUIDE.md)** - Multi-agent system architecture and implementation
+- **⚙️ [Backend Technical Guide](./BACKEND_TECHNICAL_GUIDE.md)** - FastAPI backend deep dive
+- **🎨 [Frontend Technical Guide](./FRONTEND_TECHNICAL_GUIDE.md)** - Next.js frontend architecture
+
+### 📊 Configuration & Setup
+- **💼 [Business Case](./BUSINESS_CASE.md)** - Project rationale and market analysis
+- **⚡ [Cache Configuration](./CACHE_CONFIGURATION.md)** - Redis caching setup and optimization
+- **⏱️ [Timeout Fixes](./TIMEOUT_FIXES.md)** - Performance optimization and timeout handling
+
+### 🔧 Component Documentation
+- **🔌 [API Documentation](../api/README.md)** - Backend API reference
+- **💻 [Frontend Documentation](../frontend/README.md)** - Frontend component guide
+
+---
+
+## 🎯 Overview
 
 **Issue**: When running batch post generation and verification simultaneously, the verification request would timeout after 30 seconds due to resource contention.
 

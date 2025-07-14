@@ -1,3 +1,31 @@
+# ⚡ PostAssist Cache Configuration Guide
+
+*Redis Setup and Performance Optimization for AI-Powered Content Generation*
+
+## 📋 Documentation Navigation
+
+### 🏠 Main Documentation
+- **📖 [README.md](../README.md)** - Project overview and getting started
+- **🔀 [MERGE.md](../MERGE.md)** - Branch management and merge instructions
+
+### 🛠️ Technical Guides
+- **🤖 [Agentic AI Guide](./AGENTIC_AI_GUIDE.md)** - Multi-agent system architecture and implementation
+- **⚙️ [Backend Technical Guide](./BACKEND_TECHNICAL_GUIDE.md)** - FastAPI backend deep dive
+- **🎨 [Frontend Technical Guide](./FRONTEND_TECHNICAL_GUIDE.md)** - Next.js frontend architecture
+
+### 📊 Configuration & Setup
+- **💼 [Business Case](./BUSINESS_CASE.md)** - Project rationale and market analysis
+- **⚡ [Cache Configuration](./CACHE_CONFIGURATION.md)** - Redis caching setup and optimization
+- **⏱️ [Timeout Fixes](./TIMEOUT_FIXES.md)** - Performance optimization and timeout handling
+
+### 🔧 Component Documentation
+- **🔌 [API Documentation](../api/README.md)** - Backend API reference
+- **💻 [Frontend Documentation](../frontend/README.md)** - Frontend component guide
+
+---
+
+## 🎯 Overview
+
 # 🚀 PostAssist Cache Configuration Guide - Make It Fast & Fun!
 
 Welcome to the **cache wonderland** of PostAssist! 🎉 Think of caches as your app's memory palace - the better organized it is, the faster your LinkedIn posts get generated. Let's dive into the caching magic that makes PostAssist lightning fast! ⚡
