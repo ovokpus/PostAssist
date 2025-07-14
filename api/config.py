@@ -21,10 +21,18 @@ class Settings(BaseSettings):
     
     # Redis Configuration (for task queue)
     redis_url: str = "redis://localhost:6379"
+    redis_task_ttl: int = 7200  # 2 hours default (in seconds)
+    redis_max_memory: str = "256mb"  # Maximum memory for Redis
+    redis_max_memory_policy: str = "allkeys-lru"  # Eviction policy
     
     # Rate Limiting
     rate_limit_requests: int = 100
     rate_limit_window: int = 3600  # 1 hour
+    
+    # Concurrency Control
+    max_concurrent_generations: int = 3  # Max simultaneous post generations
+    max_concurrent_verifications: int = 5  # Max simultaneous verifications
+    verification_timeout: int = 120  # Verification timeout in seconds
     
     # File Storage
     working_directory: str = "./content/data"

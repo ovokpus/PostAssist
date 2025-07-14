@@ -287,8 +287,13 @@ class PostVerificationResponse(BaseModel):
         description="Detailed verification results"
     )
     
-    approved: bool = Field(
-        description="Whether the post passed verification"
+    verified_at: str = Field(
+        description="ISO timestamp when verification was completed"
+    )
+    
+    overall_rating: str = Field(
+        description="Overall quality rating",
+        examples=["excellent", "good", "needs_improvement", "poor"]
     )
 
 

@@ -70,9 +70,9 @@ class PostVerificationRequest(BaseModel):
         max_length=3000
     )
     
-    paper_reference: Optional[str] = Field(
+    paper_title: Optional[str] = Field(
         default=None,
-        description="Reference information about the source paper",
+        description="Title of the source paper for context",
         max_length=1000
     )
     
