@@ -296,6 +296,7 @@ async def startup_event():
 
 
 @app.get("/", response_model=HealthCheckResponse)
+@app.head("/")  # Add HEAD method support for the root endpoint
 async def root():
     """Root endpoint with basic health check."""
     return HealthCheckResponse(
@@ -310,6 +311,7 @@ async def root():
 
 
 @app.get("/health", response_model=HealthCheckResponse)
+@app.head("/health")  # Add HEAD method support for health endpoint
 async def health_check():
     """Detailed health check endpoint."""
     services = {}
