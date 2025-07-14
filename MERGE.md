@@ -13,6 +13,7 @@
 
 ### 📊 Configuration & Setup
 - **💼 [Business Case](./docs/BUSINESS_CASE.md)** - Project rationale and market analysis
+- **🚀 [Railway Deployment Guide](./deploy/README.md)** - Complete Railway deployment with Redis setup
 - **⚡ [Cache Configuration](./docs/CACHE_CONFIGURATION.md)** - Redis caching setup and optimization
 - **⏱️ [Timeout Fixes](./docs/TIMEOUT_FIXES.md)** - Performance optimization and timeout handling
 
@@ -192,3 +193,158 @@ d26c254 Initial commit
 |/  
 * d26c254 Initial commit
 ``` 
+
+# How to Merge Changes Back to Main
+
+This file contains instructions for merging feature branches back to the main branch using both GitHub PR and GitHub CLI routes.
+
+## 🎉 **DEPLOYMENT SUCCESS UPDATE - JULY 2025** ✅
+
+### **🌐 Live Production URLs**
+- **Frontend**: https://post-assist-1lmcezvbs-ovo-okpubulukus-projects.vercel.app
+- **Backend**: https://postassist-production.up.railway.app  
+- **API Docs**: https://postassist-production.up.railway.app/docs
+
+### **✅ Completed Deployments**
+- ✅ **Railway Backend**: FastAPI + Redis + Multi-agent system
+- ✅ **Vercel Frontend**: Next.js 15.3.5 + All pages functional
+- ✅ **Integration**: Frontend-Backend communication verified
+- ✅ **Documentation**: All guides updated with live URLs
+
+---
+
+## Current Branch: deploy (Vercel Deployment Complete)
+
+### Changes Made
+- **Fixed Next.js Build Errors**: Resolved all ESLint errors that were preventing successful builds
+  - Fixed unused variable in `frontend/src/app/status/page.tsx`
+  - Added missing `useCallback` import and proper dependency management
+  - Removed unused `AgentFeedback` import from `frontend/src/components/ui/detailed-status.tsx`
+- **Updated Dependencies**: Upgraded Next.js from ^14.0.0 to 15.3.5
+- **Build Verification**: Confirmed successful production build and local development server
+- **✅ Successful Vercel Deployment**: Live application deployed and functional
+- **✅ Updated Documentation**: All deployment guides reflect current live state
+
+### Verification Steps Completed
+✅ Next.js build passes without errors  
+✅ Development server starts successfully on port 3001  
+✅ All static pages generate correctly  
+✅ TypeScript compilation successful  
+✅ ESLint warnings reduced to non-blocking issues  
+✅ **Vercel deployment successful - all pages live**  
+✅ **Frontend-Backend integration verified**  
+✅ **All documentation updated with live URLs**  
+
+### Deployment Details
+- **Method**: Frontend directory deployment with Vercel CLI
+- **Build Time**: ~45 seconds
+- **Pages Generated**: 8 static pages (/, /batch, /status, /verify, etc.)
+- **Bundle Size**: 101 kB shared JavaScript, optimized for performance
+- **Environment**: Production-ready with HTTPS and CDN
+
+---
+
+## GitHub PR Route
+
+1. **Push your feature branch to origin:**
+   ```bash
+   git push origin deploy
+   ```
+
+2. **Create Pull Request:**
+   - Go to your GitHub repository
+   - Click "Compare & pull request" for the `deploy` branch
+   - **Title:** `Complete Vercel deployment with documentation updates`
+   - **Description:**
+     ```
+     ## Summary
+     Successfully deployed PostAssist to Vercel and updated all documentation.
+     
+     ## 🚀 Deployment Achievements
+     - ✅ Fixed all Next.js build errors for Vercel compatibility
+     - ✅ Successfully deployed to Vercel at production URL
+     - ✅ Verified frontend-backend integration
+     - ✅ Updated all documentation with live URLs
+     - ✅ All 8 pages functional and optimized
+     
+     ## 🌐 Live URLs
+     - **Frontend**: https://post-assist-1lmcezvbs-ovo-okpubulukus-projects.vercel.app
+     - **Backend**: https://postassist-production.up.railway.app
+     - **API Docs**: https://postassist-production.up.railway.app/docs
+     
+     ## Testing Completed
+     - [x] Build passes locally: `npm run build`
+     - [x] Dev server works: `npm run dev`
+     - [x] All pages render correctly
+     - [x] Frontend-backend communication verified
+     - [x] Production deployment successful
+     - [x] Documentation updated and accurate
+     
+     ## Documentation Updates
+     - Updated VERCEL_DEPLOYMENT_GUIDE.md with current deployment method
+     - Added live URLs to README.md
+     - Reflected completion status in MERGE.md
+     
+     Ready for production use! 🎉
+     ```
+
+3. **Assign reviewers and request review**
+
+4. **Once approved, merge the PR:**
+   - Use "Squash and merge" to keep history clean
+   - Delete the feature branch after merging
+
+## GitHub CLI Route
+
+1. **Push the branch:**
+   ```bash
+   git push origin deploy
+   ```
+
+2. **Create PR using GitHub CLI:**
+   ```bash
+   gh pr create \
+     --title "Complete Vercel deployment with documentation updates" \
+     --body "Successfully deployed PostAssist frontend to Vercel with full documentation updates. Live at: https://post-assist-1lmcezvbs-ovo-okpubulukus-projects.vercel.app. All build errors resolved, deployment verified, and documentation reflects current state." \
+     --base main \
+     --head deploy
+   ```
+
+3. **Review and merge:**
+   ```bash
+   # Check PR status
+   gh pr status
+   
+   # If ready to merge (after any reviews)
+   gh pr merge --squash --delete-branch
+   ```
+
+## Post-Merge Production Status
+
+After merging to main:
+
+1. **✅ Live Production Application:**
+   - Frontend fully deployed and functional on Vercel
+   - Backend running smoothly on Railway with Redis
+   - All API endpoints accessible and documented
+
+2. **✅ Verified Functionality:**
+   - Post generation working with real-time progress
+   - Batch processing operational
+   - Status monitoring active
+   - Verification tools functional
+
+3. **✅ Documentation Complete:**
+   - All guides updated with current URLs
+   - Deployment methods documented
+   - Troubleshooting sections current
+
+## Notes
+
+- **Vercel Deployment**: Successfully completed using frontend directory method
+- **Next.js Framework**: Auto-detected and optimized for production
+- **Environment Variables**: Properly configured via frontend/vercel.json
+- **Performance**: Optimized build with CDN distribution
+- **Documentation**: Comprehensive guides reflect actual deployment state
+
+The PostAssist AI-powered LinkedIn post generator is now fully operational and ready for users! 🚀 

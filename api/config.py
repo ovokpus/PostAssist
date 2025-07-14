@@ -9,7 +9,11 @@ class Settings(BaseSettings):
     app_version: str = "1.0.0"
     debug: bool = False
     host: str = "0.0.0.0"
-    port: int = 8000
+    port: int = int(os.environ.get("PORT", 8000))  # Railway sets PORT env var
+    
+    # Railway Environment Detection
+    railway_environment: Optional[str] = os.environ.get("RAILWAY_ENVIRONMENT")
+    is_railway_deployment: bool = railway_environment is not None
     
     # OpenAI Configuration
     openai_api_key: str = ""
