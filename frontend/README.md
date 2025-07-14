@@ -128,6 +128,17 @@ NEXT_PUBLIC_APP_VERSION=1.0.0
 NODE_ENV=development
 ```
 
+**⚠️ IMPORTANT**: For local development testing with the Railway backend instead of a local backend, use:
+```env
+NEXT_PUBLIC_API_URL=https://postassist-production.up.railway.app
+```
+
+**🔧 Troubleshooting API Connection Issues**:
+1. **Verify Backend URL**: Make sure your Railway backend is accessible at the URL in your environment variables
+2. **Check Environment Variables**: Ensure `NEXT_PUBLIC_API_URL` is set correctly (note the `NEXT_PUBLIC_` prefix is required for client-side access)
+3. **CORS Issues**: The backend should already be configured for CORS, but if you see CORS errors, check the backend's CORS middleware configuration
+4. **Network Issues**: Use `curl` to test the backend directly: `curl https://your-backend-url/health`
+
 ### 4. Start Development Server
 
 ```bash
