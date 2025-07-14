@@ -15,6 +15,7 @@
 
 ### 📊 Configuration & Setup
 - **💼 [Business Case](./BUSINESS_CASE.md)** - Project rationale and market analysis
+- **🚀 [Railway Deployment Guide](../deploy/README.md)** - Complete Railway deployment with Redis setup
 - **⚡ [Cache Configuration](./CACHE_CONFIGURATION.md)** - Redis caching setup and optimization
 - **⏱️ [Timeout Fixes](./TIMEOUT_FIXES.md)** - Performance optimization and timeout handling
 
