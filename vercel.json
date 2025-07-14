@@ -5,7 +5,7 @@
     "outputDirectory": "frontend/.next",
     "framework": "nextjs",
     "env": {
-        "NEXT_PUBLIC_API_BASE_URL": "https://replysight-production.up.railway.app"
+        "NEXT_PUBLIC_API_BASE_URL": "https://postassist-production.up.railway.app"
     },
     "headers": [
         {
