@@ -1,15 +1,12 @@
 {
     "version": 2,
-    "installCommand": "cd frontend && npm install",
-    "buildCommand": "cd frontend && npm run build",
-    "outputDirectory": "frontend/.next",
     "framework": "nextjs",
     "env": {
         "NEXT_PUBLIC_API_BASE_URL": "https://postassist-production.up.railway.app"
     },
     "headers": [
         {
-            "source": "frontend/(.*)",
+            "source": "/(.*)",
             "headers": [
                 {
                     "key": "X-Content-Type-Options",
@@ -25,11 +22,5 @@
                 }
             ]
         }
-    ],
-    "rewrites": [
-        {
-            "source": "frontend/(.*)",
-            "destination": "/$1"
-        }
     ]
-}
+} 
