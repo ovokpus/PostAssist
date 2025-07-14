@@ -4,7 +4,7 @@ AI-powered LinkedIn post generation for machine learning papers with multi-agent
 
 ## 🌐 **LIVE APPLICATION - DEPLOYED AND READY!** 🚀
 
-**✅ Frontend**: https://post-assist-1lmcezvbs-ovo-okpubulukus-projects.vercel.app  
+**✅ Frontend**: https://post-assist.vercel.app
 **✅ Backend**: https://postassist-production.up.railway.app  
 **📊 API Docs**: https://postassist-production.up.railway.app/docs  
 
