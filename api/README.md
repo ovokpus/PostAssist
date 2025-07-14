@@ -1,3 +1,31 @@
+# 🔌 PostAssist API Documentation
+
+*FastAPI Backend Reference and Integration Guide*
+
+## 📋 Documentation Navigation
+
+### 🏠 Main Documentation
+- **📖 [README.md](../README.md)** - Project overview and getting started
+- **🔀 [MERGE.md](../MERGE.md)** - Branch management and merge instructions
+
+### 🛠️ Technical Guides
+- **🤖 [Agentic AI Guide](../docs/AGENTIC_AI_GUIDE.md)** - Multi-agent system architecture and implementation
+- **⚙️ [Backend Technical Guide](../docs/BACKEND_TECHNICAL_GUIDE.md)** - FastAPI backend deep dive
+- **🎨 [Frontend Technical Guide](../docs/FRONTEND_TECHNICAL_GUIDE.md)** - Next.js frontend architecture
+
+### 📊 Configuration & Setup
+- **💼 [Business Case](../docs/BUSINESS_CASE.md)** - Project rationale and market analysis
+- **⚡ [Cache Configuration](../docs/CACHE_CONFIGURATION.md)** - Redis caching setup and optimization
+- **⏱️ [Timeout Fixes](../docs/TIMEOUT_FIXES.md)** - Performance optimization and timeout handling
+
+### 🔧 Component Documentation
+- **🔌 [API Documentation](./README.md)** - Backend API reference
+- **💻 [Frontend Documentation](../frontend/README.md)** - Frontend component guide
+
+---
+
+## 🚀 API Overview
+
 # LinkedIn ML Paper Post Generation API
 
 A FastAPI backend that uses multi-agent LangGraph workflows to generate engaging LinkedIn posts about machine learning research papers.

@@ -3,6 +3,33 @@ from langchain_core.tools import tool
 import re
 
 
+def remove_markdown_formatting(text: str) -> str:
+    """Remove markdown formatting to make text LinkedIn-appropriate."""
+    # Remove bold (**text** and __text__)
+    text = re.sub(r'\*\*(.*?)\*\*', r'\1', text)
+    text = re.sub(r'__(.*?)__', r'\1', text)
+    
+    # Remove italic (*text* and _text_)
+    text = re.sub(r'\*(.*?)\*', r'\1', text)
+    text = re.sub(r'_(.*?)_', r'\1', text)
+    
+    # Remove headers (# ## ###)
+    text = re.sub(r'^#{1,6}\s*', '', text, flags=re.MULTILINE)
+    
+    # Remove code blocks (```code```)
+    text = re.sub(r'```.*?```', '', text, flags=re.DOTALL)
+    text = re.sub(r'`(.*?)`', r'\1', text)
+    
+    # Remove links but keep text [text](url) -> text
+    text = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', text)
+    
+    # Clean up extra whitespace
+    text = re.sub(r'\n{3,}', '\n\n', text)
+    text = text.strip()
+    
+    return text
+
+
 @tool
 def create_linkedin_post(
     content: Annotated[str, "The main content for the LinkedIn post"],
@@ -13,7 +40,7 @@ def create_linkedin_post(
     max_hashtags: Annotated[int, "Maximum number of hashtags"] = 10,
     tone: Annotated[str, "Tone of the post (professional, casual, academic)"] = "professional"
 ) -> Annotated[str, "Generated LinkedIn post"]:
-    """Create a LinkedIn post about a machine learning paper."""
+    """Create a LinkedIn post about a machine learning paper without markdown formatting."""
     
     # Choose appropriate emoji based on tone
     emoji_map = {
@@ -23,22 +50,26 @@ def create_linkedin_post(
     }
     opening_emoji = emoji_map.get(tone, "🚀")
     
-    # Create engaging opening based on audience
+    # Create engaging opening based on audience (without markdown)
     if target_audience == "academic":
-        opening = f"{opening_emoji} **New Research Alert: {paper_title}**"
+        opening = f"{opening_emoji} New Research Alert: {paper_title}"
     elif target_audience == "general":
-        opening = f"{opening_emoji} **Exciting breakthrough in AI!**"
+        opening = f"{opening_emoji} Exciting breakthrough in AI!"
     else:  # professional
-        opening = f"{opening_emoji} **Transforming the Future of AI: {paper_title}**"
+        opening = f"{opening_emoji} Transforming the Future of AI: {paper_title}"
+    
+    # Remove any markdown from the content
+    clean_content = remove_markdown_formatting(content)
     
     # Format the main content
-    post = f"{opening}\n\n{content}\n\n"
+    post = f"{opening}\n\n{clean_content}\n\n"
     
-    # Add key insights section
+    # Add key insights section (without markdown)
     if key_insights:
-        post += "💡 **Key Takeaways:**\n"
+        post += "💡 Key Takeaways:\n"
         for i, insight in enumerate(key_insights[:5], 1):  # Limit to 5 insights
-            post += f"\n{i}. {insight}"
+            clean_insight = remove_markdown_formatting(insight)
+            post += f"\n{i}. {clean_insight}"
         post += "\n\n"
     
     # Add engagement question based on audience
@@ -53,7 +84,10 @@ def create_linkedin_post(
     hashtags = generate_linkedin_hashtags(paper_title, key_insights, max_hashtags)
     post += " ".join(hashtags)
     
-    return post
+    # Final cleanup to ensure no markdown remains
+    final_post = remove_markdown_formatting(post)
+    
+    return final_post
 
 
 @tool
@@ -86,30 +120,31 @@ def verify_technical_accuracy(
         accuracy_issues.append("Missing author attribution")
         recommendations.append("Add proper attribution to paper authors")
     
-    # Generate verification report
-    accuracy_score = max(0.0, 1.0 - (len(accuracy_issues) * 0.2))
+    # Generate verification report (convert to percentage for consistency with style checker)
+    accuracy_score_decimal = max(0.0, 1.0 - (len(accuracy_issues) * 0.2))
+    accuracy_score_percentage = accuracy_score_decimal * 100
     
     verification_report = f"""
-TECHNICAL VERIFICATION REPORT:
-=============================
+                TECHNICAL VERIFICATION REPORT:
+                =============================
 
-POST CONTENT ANALYZED:
-{post_content[:500]}...
+                POST CONTENT ANALYZED:
+                {post_content[:500]}...
 
-TECHNICAL TERMS IDENTIFIED:
-{', '.join(technical_terms) if technical_terms else 'None detected'}
+                TECHNICAL TERMS IDENTIFIED:
+                {', '.join(technical_terms) if technical_terms else 'None detected'}
 
-ACCURACY ASSESSMENT:
-Score: {accuracy_score:.2f}/1.0
+                ACCURACY ASSESSMENT:
+                Score: {accuracy_score_percentage:.1f}%
 
-ISSUES IDENTIFIED:
-{chr(10).join(f'- {issue}' for issue in accuracy_issues) if accuracy_issues else '- No major issues detected'}
+                ISSUES IDENTIFIED:
+                {chr(10).join(f'- {issue}' for issue in accuracy_issues) if accuracy_issues else '- No major issues detected'}
 
-RECOMMENDATIONS:
-{chr(10).join(f'- {rec}' for rec in recommendations) if recommendations else '- Post appears technically sound'}
+                RECOMMENDATIONS:
+                {chr(10).join(f'- {rec}' for rec in recommendations) if recommendations else '- Post appears technically sound'}
 
-STATUS: {'APPROVED' if accuracy_score >= 0.7 else 'NEEDS REVISION'}
-"""
+                STATUS: {'APPROVED' if accuracy_score_decimal >= 0.7 else 'NEEDS REVISION'}
+                """
     return verification_report
 
 
@@ -131,8 +166,9 @@ def check_linkedin_style(
         style_issues.append(f"Post too short ({char_count} chars)")
         recommendations.append("Add more valuable content")
     
-    # Check for appropriate emoji usage
-    emoji_count = len(re.findall(r'[\U0001F600-\U0001F64F\U0001F300-\U0001F5FF\U0001F680-\U0001F6FF\U0001F1E0-\U0001F1FF]', post_content))
+    # Check for appropriate emoji usage (fixed regex to include all emoji ranges)
+    emoji_pattern = r'[\U0001F600-\U0001F64F\U0001F300-\U0001F5FF\U0001F680-\U0001F6FF\U0001F1E0-\U0001F1FF\U0001F900-\U0001F9FF\U00002600-\U000027BF]'
+    emoji_count = len(re.findall(emoji_pattern, post_content))
     if emoji_count > 10:
         style_issues.append(f"Too many emojis ({emoji_count})")
         recommendations.append("Reduce emoji usage for professional tone")
@@ -161,8 +197,17 @@ def check_linkedin_style(
         style_issues.append("Poor formatting - no line breaks")
         recommendations.append("Add line breaks for better readability")
     
-    # Calculate style score
-    style_score = max(0.0, 1.0 - (len(style_issues) * 0.15))
+    # Improved scoring logic - start high and deduct less per issue
+    base_score = 0.85  # Start with a good base score
+    # Deduct based on severity of issues
+    major_issues = ["Post too long", "Post too short", "Too many emojis", "Too many hashtags"]
+    minor_issues = ["No emojis used", "No hashtags found", "Missing engagement question", "Poor formatting"]
+    
+    major_issue_count = sum(1 for issue in style_issues if any(major in issue for major in major_issues))
+    minor_issue_count = len(style_issues) - major_issue_count
+    
+    style_score = base_score - (major_issue_count * 0.25) - (minor_issue_count * 0.1)
+    style_score = max(0.0, min(1.0, style_score))  # Clamp between 0 and 1
     
     style_report = f"""
 LINKEDIN STYLE ASSESSMENT:

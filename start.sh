@@ -42,9 +42,9 @@ mkdir -p content/data
 echo "✅ Content directory created"
 
 # Install dependencies if not already installed
-if [ ! -d "venv" ]; then
+if [ ! -d ".venv" ]; then
     echo "🔧 Creating virtual environment..."
-    python -m venv venv
+    uv venv
 fi
 
 echo "🔧 Activating virtual environment..."
@@ -68,5 +68,5 @@ echo "   - GET /health - Health check"
 echo ""
 
 # Start the FastAPI application
-cd app
+cd api
 python main.py 
