@@ -24,7 +24,7 @@ pydantic-settings>=2.1.0,<3.0.0
 
 # Environment configuration
 python-dotenv>=1.0.1
-redis>=5.0.1
+redis
 
 # Type hints
 typing-extensions>=4.8.0
