@@ -1,13 +1,12 @@
-version: '3.8'
-
 services:
-  postassist:
+  api:
     build: .
     ports:
-      - "8000:8000"
+      - "${API_PORT:-8000}:8000"
     environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - TAVILY_API_KEY=${TAVILY_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - TAVILY_API_KEY=${TAVILY_API_KEY:-}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o-mini}
       - REDIS_URL=redis://redis:6379
       - DEBUG=false
     depends_on:
@@ -16,24 +15,33 @@ services:
       - ./content:/app/content
     restart: unless-stopped
 
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        API_INTERNAL_URL: http://api:8000
+    ports:
+      - "${FRONTEND_PORT:-3001}:3001"
+    depends_on:
+      - api
+
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379:6379"
     command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
     volumes:
       - redis_data:/data
     restart: unless-stopped
 
+  # Optional Redis browser: docker compose --profile tools up
   redis-commander:
     image: rediscommander/redis-commander:latest
+    profiles: ["tools"]
     environment:
       - REDIS_HOSTS=local:redis:6379
     ports:
       - "8081:8081"
     depends_on:
       - redis
-    restart: unless-stopped
 
 volumes:
-  redis_data: 
+  redis_data:

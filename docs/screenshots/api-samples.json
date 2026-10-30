@@ -1,0 +1,96 @@
+{
+  "/health": {
+    "status": "degraded",
+    "version": "1.0.0",
+    "timestamp": "2026-10-30T14:08:49.500051",
+    "services": {
+      "openai": "not_configured",
+      "tavily": "not_configured",
+      "redis": "connected"
+    }
+  },
+  "/tasks": [
+    {
+      "task_id": "2feb3f95-d1c6-46e8-a718-bbc4c4e81814",
+      "status": "failed",
+      "progress": 1.0,
+      "current_step": "failed",
+      "teams": [
+        {
+          "team_name": "Content team",
+          "status": "in_progress",
+          "progress": 0.05,
+          "current_focus": "Starting research on ML paper",
+          "agents": [
+            {
+              "agent_name": "PaperResearcher",
+              "status": "working",
+              "current_activity": "Searching for paper information",
+              "progress": 0.1,
+              "findings": null,
+              "last_update": "2026-10-30T14:08:30.643193",
+              "error_message": null
+            },
+            {
+              "agent_name": "LinkedInCreator",
+              "status": "idle",
+              "current_activity": "Waiting for research data",
+              "progress": 0.0,
+              "findings": null,
+              "last_update": "2026-10-30T14:08:30.273725",
+              "error_message": null
+            }
+          ],
+          "team_findings": null,
+          "started_at": "2026-10-30T14:08:30.273244",
+          "completed_at": null
+        },
+        {
+          "team_name": "Verification team",
+          "status": "pending",
+          "progress": 0.0,
+          "current_focus": null,
+          "agents": [
+            {
+              "agent_name": "TechVerifier",
+              "status": "idle",
+              "current_activity": "Standing by for verification",
+              "progress": 0.0,
+              "findings": null,
+              "last_update": "2026-10-30T14:08:30.274136",
+              "error_message": null
+            },
+            {
+              "agent_name": "StyleChecker",
+              "status": "idle",
+              "current_activity": "Ready for style review",
+              "progress": 0.0,
+              "findings": null,
+              "last_update": "2026-10-30T14:08:30.274457",
+              "error_message": null
+            }
+          ],
+          "team_findings": null,
+          "started_at": null,
+          "completed_at": null
+        }
+      ],
+      "current_team": "Content team",
+      "phase": "research",
+      "detailed_status": "PaperResearcher is searching for paper information",
+      "result": null,
+      "verification": null,
+      "error_message": "No post was generated: OPENAI_API_KEY, TAVILY_API_KEY not configured",
+      "request_data": {
+        "paper_title": "Attention Is All You Need",
+        "additional_context": null,
+        "target_audience": "professional",
+        "include_technical_details": true,
+        "max_hashtags": 10,
+        "tone": "professional"
+      },
+      "created_at": "2026-10-30T14:08:30.272103",
+      "updated_at": "2026-10-30T14:08:30.838005"
+    }
+  ]
+}

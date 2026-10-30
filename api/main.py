@@ -1,3 +1,4 @@
+import os
 """Main FastAPI application for LinkedIn ML Paper Post Generation."""
 
 import uuid
@@ -287,7 +288,7 @@ async def get_all_tasks() -> List[Dict[str, Any]]:
 async def startup_event():
     """Initialize application on startup."""
     try:
-        validate_api_keys()
+        validate_api_keys(strict=os.environ.get('REQUIRE_API_KEYS', 'false').lower() == 'true')
         await get_redis_client()
         print(f"🚀 {settings.app_name} v{settings.app_version} started successfully!")
     except Exception as e:
@@ -532,6 +533,17 @@ async def run_post_generation_task(task_id: str, request: PostGenerationRequest)
                 # Clean up any markdown formatting that might have gotten through
                 final_post_content = remove_markdown_formatting(final_post_content)
                 
+                if not final_post_content.strip():
+                    # Previously an empty post was reported as "completed" (seen locally with no API keys).
+                    from api.config import missing_api_keys
+                    missing = missing_api_keys()
+                    reason = f"{', '.join(missing)} not configured" if missing else "the agents returned no content"
+                    await update_task_status(
+                        task_id, TaskStatus.FAILED, 1.0, "failed",
+                        error=f"No post was generated: {reason}"
+                    )
+                    return
+
                 # Create LinkedIn post object
                 linkedin_post = LinkedInPost(
                     content=final_post_content,

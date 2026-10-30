@@ -5,8 +5,14 @@ from api.config import settings
 import os
 
 
-# Initialize Tavily search tool
-tavily_tool = TavilySearchResults(max_results=5)
+# Initialize Tavily search tool.
+# Without TAVILY_API_KEY the wrapper raises at import time, which crashed the whole API on startup.
+# A placeholder key lets the app (UI, /health, task history) start; searches then fail with Tavily's auth error.
+if settings.tavily_api_key:
+    tavily_tool = TavilySearchResults(max_results=5)
+else:
+    from langchain_community.utilities.tavily_search import TavilySearchAPIWrapper
+    tavily_tool = TavilySearchResults(max_results=5, api_wrapper=TavilySearchAPIWrapper(tavily_api_key="not-configured"))
 
 
 @tool
