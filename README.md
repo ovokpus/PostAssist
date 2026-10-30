@@ -1,5 +1,7 @@
 # PostAssist
 
+<p align="center"><img src="docs/assets/hero.svg" alt="PostAssist" width="100%"/></p>
+
 > Type the title of a machine-learning paper and get a LinkedIn post about it. Behind the scenes, a LangGraph team of agents researches the paper, writes the post, and checks it for technical accuracy and style.
 
 ![Generate page](docs/screenshots/generate.png)
@@ -9,6 +11,8 @@
 Writing a good post about a research paper takes two kinds of skill: understanding the paper, and writing for LinkedIn. PostAssist gives each job to its own agent and adds a second team that checks the result before you see it.
 
 ## 2. How it works
+
+<p align="center"><img src="docs/assets/flow.svg" alt="PostAssist data flow" width="100%"/></p>
 
 ```mermaid
 flowchart LR
