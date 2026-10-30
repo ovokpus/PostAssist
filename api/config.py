@@ -65,12 +65,20 @@ def get_settings() -> Settings:
     return settings
 
 
-def validate_api_keys():
-    """Validate that required API keys are present."""
-    if not settings.openai_api_key:
-        raise ValueError("OPENAI_API_KEY environment variable is required")
-    if not settings.tavily_api_key:
-        raise ValueError("TAVILY_API_KEY environment variable is required")
+def missing_api_keys() -> list:
+    """Names of the model/search keys that are not configured."""
+    return [name for name, value in (("OPENAI_API_KEY", settings.openai_api_key),
+                                     ("TAVILY_API_KEY", settings.tavily_api_key)) if not value]
+
+
+def validate_api_keys(strict: bool = False):
+    """Check the required API keys. Raises when strict; otherwise warns so the UI and /health
+    still run locally without keys (generation then fails with a clear error)."""
+    missing = missing_api_keys()
+    if missing and strict:
+        raise ValueError(f"{', '.join(missing)} environment variable(s) required")
+    if missing:
+        print(f"⚠️  {', '.join(missing)} not set: post generation and verification will not work")
 
 
 # Set environment variables for LangChain
