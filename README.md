@@ -6,6 +6,10 @@
 
 ![Generate page](docs/screenshots/generate.png)
 
+## Business case
+
+Writing a good post about a research paper takes an expert's time, and unchecked AI drafts can get the facts wrong. PostAssist uses one team of agents to research and write the post and a second team to check its accuracy and style before a person sees it. The savings are modest and the quality still has to be proved on real papers. [docs/BUSINESS_CASE.md](docs/BUSINESS_CASE.md) covers the use cases, an illustrative ROI model and the limits.
+
 ## 1. The idea
 
 Writing a good post about a research paper takes two kinds of skill: understanding the paper, and writing for LinkedIn. PostAssist gives each job to its own agent and adds a second team that checks the result before you see it.
