@@ -1,5 +1,7 @@
 # PostAssist
 
+<p align="center"><img src="assets/banner.jpg" alt="Two brass rubber stamps, an ink pad, loose sheets of paper and a red pencil on a dark surface" width="100%"></p>
+
 <p align="center"><img src="docs/assets/hero.svg" alt="PostAssist" width="100%"/></p>
 
 > Type the title of a machine-learning paper and get a LinkedIn post about it. Behind the scenes, a LangGraph team of agents researches the paper, writes the post, and checks it for technical accuracy and style.
