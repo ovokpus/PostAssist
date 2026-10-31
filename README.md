@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/banner.jpg" alt="Two brass rubber stamps, an ink pad, loose sheets of paper and a red pencil on a dark surface" width="100%"></p>
+
 # PostAssist
 
 <p align="center"><img src="docs/assets/hero.svg" alt="PostAssist" width="100%"/></p>
